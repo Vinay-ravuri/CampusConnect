@@ -1,182 +1,343 @@
 import { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
 import Navbar from '../components/Navbar'
 import AIAssistant from '../components/AIAssistant'
-
-const SUBJECTS = {
-  jntu: [
-  { id: 1,  name: 'Mathematics – I',                    year: '1st Year', sem: 'Sem 1', branch: 'Common', reg: 'R23' },
-  { id: 2,  name: 'Engineering Physics',                year: '1st Year', sem: 'Sem 1', branch: 'Common', reg: 'R23' },
-  { id: 3,  name: 'English for Engineers',              year: '1st Year', sem: 'Sem 1', branch: 'Common', reg: 'R23' },
-  { id: 4,  name: 'Mathematics – II',                   year: '1st Year', sem: 'Sem 2', branch: 'Common', reg: 'R23' },
-  { id: 5,  name: 'C Programming & Problem Solving',    year: '1st Year', sem: 'Sem 2', branch: 'Common', reg: 'R23' },
-  { id: 6,  name: 'Engineering Chemistry',              year: '1st Year', sem: 'Sem 2', branch: 'Common', reg: 'R23' },
-  { id: 7,  name: 'Data Structures',                    year: '2nd Year', sem: 'Sem 1', branch: 'CSE',    reg: 'R23' },
-  { id: 8,  name: 'Object Oriented Programming (Java)', year: '2nd Year', sem: 'Sem 1', branch: 'CSE',    reg: 'R23' },
-  { id: 9,  name: 'Computer Organization',              year: '2nd Year', sem: 'Sem 1', branch: 'CSE',    reg: 'R23' },
-  { id: 10, name: 'Discrete Mathematics',               year: '2nd Year', sem: 'Sem 2', branch: 'CSE',    reg: 'R23' },
-  { id: 11, name: 'Database Management Systems',        year: '2nd Year', sem: 'Sem 2', branch: 'CSE',    reg: 'R23' },
-  { id: 12, name: 'Design & Analysis of Algorithms',    year: '2nd Year', sem: 'Sem 2', branch: 'CSE',    reg: 'R23' },
-  { id: 13, name: 'Operating Systems',                  year: '3rd Year', sem: 'Sem 1', branch: 'CSE',    reg: 'R23' },
-  { id: 14, name: 'Computer Networks',                  year: '3rd Year', sem: 'Sem 1', branch: 'CSE',    reg: 'R23' },
-  { id: 15, name: 'Software Engineering',               year: '3rd Year', sem: 'Sem 1', branch: 'CSE',    reg: 'R23' },
-  { id: 16, name: 'Web Technologies',                   year: '3rd Year', sem: 'Sem 2', branch: 'CSE',    reg: 'R23' },
-  { id: 17, name: 'Compiler Design',                    year: '3rd Year', sem: 'Sem 2', branch: 'CSE',    reg: 'R23' },
-  { id: 18, name: 'Theory of Computation',              year: '3rd Year', sem: 'Sem 2', branch: 'CSE',    reg: 'R23' },
-  { id: 19, name: 'Machine Learning',                   year: '4th Year', sem: 'Sem 1', branch: 'CSE',    reg: 'R23' },
-  { id: 20, name: 'Deep Learning',                      year: '4th Year', sem: 'Sem 1', branch: 'CSE',    reg: 'R23' },
-  { id: 21, name: 'Cloud Computing',                    year: '4th Year', sem: 'Sem 1', branch: 'CSE',    reg: 'R23' },
-  { id: 22, name: 'Big Data Analytics',                 year: '4th Year', sem: 'Sem 2', branch: 'CSE',    reg: 'R23' },
-  { id: 23, name: 'Cyber Security',                     year: '4th Year', sem: 'Sem 2', branch: 'CSE',    reg: 'R23' },
-],
-  au: [
-    { id: 1, name: 'Linear Algebra & Calculus', year: '1st Year', sem: 'Sem 1', branch: 'Common' },
-    { id: 2, name: 'Engineering Chemistry', year: '1st Year', sem: 'Sem 1', branch: 'Common' },
-    { id: 3, name: 'Python Programming', year: '1st Year', sem: 'Sem 2', branch: 'Common' },
-    { id: 4, name: 'Data Structures Using C', year: '2nd Year', sem: 'Sem 1', branch: 'CSE' },
-    { id: 5, name: 'DBMS', year: '2nd Year', sem: 'Sem 2', branch: 'CSE' },
-    { id: 6, name: 'Computer Architecture', year: '3rd Year', sem: 'Sem 1', branch: 'CSE' },
-    { id: 7, name: 'Software Engineering', year: '3rd Year', sem: 'Sem 2', branch: 'CSE' },
-    { id: 8, name: 'Deep Learning', year: '4th Year', sem: 'Sem 1', branch: 'CSE' },
-  ],
-  uni: [
-    { id: 1, name: 'Discrete Mathematics', year: '1st Year', sem: 'Sem 2', branch: 'CSE' },
-    { id: 2, name: 'Digital Logic Design', year: '1st Year', sem: 'Sem 2', branch: 'CSE' },
-    { id: 3, name: 'Cloud Computing', year: '4th Year', sem: 'Sem 1', branch: 'CSE' },
-    { id: 4, name: 'Big Data Analytics', year: '4th Year', sem: 'Sem 2', branch: 'CSE' },
-    { id: 5, name: 'Compiler Design', year: '3rd Year', sem: 'Sem 2', branch: 'CSE' },
-    { id: 6, name: 'Computer Graphics', year: '3rd Year', sem: 'Sem 2', branch: 'CSE' },
-  ],
-}
+import PremiumBackground3D from '../components/PremiumBackground3D'
+import { getSubjectsByRegulation } from '../api/subjects'
 
 const REG_INFO = {
-  jntu: { label: 'JNTU Regulation', color: '#4f8aff' },
-  au:   { label: 'Andhra University', color: '#00e5c0' },
-  uni:  { label: 'University Syllabus', color: '#a855f7' },
+  JNTUK: { label: 'JNTUK Regulation', color: '#FF7A00' },
+  AU:    { label: 'Andhra University',  color: '#FFB800' },
+  UNI:   { label: 'University Syllabus', color: '#F97316' },
 }
 
 const YEARS = ['All', '1st Year', '2nd Year', '3rd Year', '4th Year']
 
+const cardVariants = {
+  hidden: { opacity: 0, scale: 0.95, y: 16 },
+  visible: (i) => ({
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { duration: 0.45, delay: i * 0.04, ease: [0.22, 1, 0.36, 1] }
+  }),
+  exit: { opacity: 0, scale: 0.95, y: -8, transition: { duration: 0.2 } },
+}
+
 export default function SubjectList() {
-  const { regId } = useParams()
-  const navigate = useNavigate()
-  const [search, setSearch] = useState('')
+  const { regId }   = useParams()
+  const navigate    = useNavigate()
+  const [search, setSearch]       = useState('')
   const [yearFilter, setYearFilter] = useState('All')
-  const [visible, setVisible] = useState(false)
-  const [hovered, setHovered] = useState(null)
+  const [visible, setVisible]     = useState(false)
+  const [hovered, setHovered]     = useState(null)
+  const [subjects, setSubjects]   = useState([])
+  const [loading, setLoading]     = useState(true)
 
-  useEffect(() => { setTimeout(() => setVisible(true), 100) }, [])
+  useEffect(() => {
+    setTimeout(() => setVisible(true), 100)
+  }, [regId])
 
-  const reg = REG_INFO[regId] || REG_INFO.jntu
-  const subjects = SUBJECTS[regId] || []
+  useEffect(() => {
+    setLoading(true)
+    getSubjectsByRegulation(regId)
+      .then(data => setSubjects(data))
+      .catch(err => console.error('Failed to load subjects:', err))
+      .finally(() => setLoading(false))
+  }, [regId])
+
+  const reg = REG_INFO[regId] || REG_INFO.JNTUK
 
   const filtered = subjects.filter(s => {
     const matchSearch = s.name.toLowerCase().includes(search.toLowerCase())
-    const matchYear = yearFilter === 'All' || s.year === yearFilter
+    const matchYear   = yearFilter === 'All' || s.year === yearFilter
     return matchSearch && matchYear
   })
 
   return (
-    <div style={{ minHeight: '100vh', background: '#04040a' }}>
+    <div style={{
+      minHeight: '100vh',
+      position: 'relative',
+      overflowX: 'hidden',
+    }}>
+      {/* 3D background dynamic effect */}
+      <PremiumBackground3D />
+
+      {/* Navigation */}
       <Navbar />
 
-      <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
-        <div style={{ position: 'absolute', width: 500, height: 500, borderRadius: '50%', background: `radial-gradient(circle, ${reg.color}08 0%, transparent 70%)`, top: '10%', right: '10%' }} />
-      </div>
+      <div style={{
+        position: 'relative',
+        zIndex: 2,
+        maxWidth: '1020px',
+        margin: '0 auto',
+        padding: '120px 24px 60px',
+      }}>
 
-      <div style={{ position: 'relative', zIndex: 1, maxWidth: 1000, margin: '0 auto', padding: '100px 24px 60px' }}>
+        {/* Back Link */}
+        <motion.button
+          onClick={() => navigate('/student')}
+          whileHover={{ x: -4, color: reg.color }}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: 'var(--text-3)',
+            cursor: 'pointer',
+            fontSize: '12px',
+            letterSpacing: '1.5px',
+            fontFamily: 'var(--font-accent)',
+            marginBottom: '32px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            fontWeight: 700,
+            transition: 'color 0.25s',
+          }}
+        >
+          ← Back to Regulations
+        </motion.button>
 
-        {/* Back */}
-        <button onClick={() => navigate('/student')} style={{ background: 'none', border: 'none', color: '#555566', cursor: 'pointer', fontSize: 13, letterSpacing: 2, fontFamily: 'Bebas Neue,sans-serif', marginBottom: 32, display: 'flex', alignItems: 'center', gap: 8, transition: 'color 0.2s' }}
-          onMouseEnter={e => e.currentTarget.style.color = '#f0f0f5'}
-          onMouseLeave={e => e.currentTarget.style.color = '#555566'}>
-          ← BACK TO REGULATIONS
-        </button>
-
-        {/* Header */}
-        <div style={{ opacity: visible ? 1 : 0, transform: visible ? 'translateY(0)' : 'translateY(20px)', transition: 'all 0.6s ease', marginBottom: 40 }}>
-          <div style={{ display: 'inline-block', padding: '4px 14px', borderRadius: 6, background: reg.color + '22', border: `1px solid ${reg.color}44`, marginBottom: 16 }}>
-            <span style={{ fontFamily: 'Bebas Neue,sans-serif', fontSize: 12, letterSpacing: 3, color: reg.color }}>{reg.label}</span>
+        {/* Header Title */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={visible ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          style={{ marginBottom: '40px' }}
+        >
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            padding: '4px 14px',
+            borderRadius: '8px',
+            background: reg.color + '15',
+            border: `1px solid ${reg.color}25`,
+            marginBottom: '16px',
+          }}>
+            <span style={{
+              fontFamily: 'var(--font-accent)',
+              fontSize: '11px',
+              fontWeight: 700,
+              letterSpacing: '2px',
+              color: reg.color,
+              textTransform: 'uppercase',
+            }}>
+              {reg.label}
+            </span>
           </div>
-          <div style={{ fontFamily: 'Bebas Neue,sans-serif', fontSize: 'clamp(32px,5vw,56px)', letterSpacing: 3, color: '#f0f0f5', lineHeight: 1, marginBottom: 8 }}>
-            SELECT SUBJECT
-          </div>
-          <p style={{ fontSize: 13, color: '#555566' }}>{filtered.length} subjects available</p>
-        </div>
+          <h1 style={{
+            fontFamily: 'var(--font-heading)',
+            fontWeight: 900,
+            fontSize: 'clamp(28px, 5vw, 56px)',
+            letterSpacing: '-1.5px',
+            color: 'var(--text)',
+            lineHeight: 1.05,
+            marginBottom: '8px',
+            textTransform: 'uppercase',
+          }}>
+            Select Subject
+          </h1>
+          <p style={{ fontSize: '13px', color: 'var(--text-4)', fontWeight: 500, fontFamily: 'var(--font-accent)', letterSpacing: '0.5px' }}>
+            {loading ? 'READING DATABASE…' : `${filtered.length} SUBJECTS INDEXED`}
+          </p>
+        </motion.div>
 
-        {/* Search + Filter */}
-        <div style={{ display: 'flex', gap: 12, marginBottom: 32, flexWrap: 'wrap' }}>
-          {/* Search */}
-          <div style={{ flex: 1, minWidth: 200, display: 'flex', alignItems: 'center', gap: 12, background: '#0e0e1c', border: '1px solid #ffffff0f', borderRadius: 12, padding: '12px 18px' }}>
-            <span style={{ fontSize: 16, opacity: 0.4 }}>🔍</span>
+        {/* Search & Filters */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={visible ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.5, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+          style={{ display: 'flex', gap: '16px', marginBottom: '44px', flexWrap: 'wrap' }}
+        >
+          {/* Search bar */}
+          <div style={{
+            flex: 1,
+            minWidth: '240px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            background: 'rgba(255, 255, 255, 0.65)',
+            backdropFilter: 'blur(24px)',
+            border: '1px solid rgba(91, 108, 255, 0.15)',
+            borderRadius: '14px',
+            padding: '10px 18px',
+            boxShadow: 'var(--shadow-sm)',
+          }}>
+            <span style={{ fontSize: '16px', opacity: 0.5 }}>🔍</span>
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="Search subjects..."
-              style={{ flex: 1, background: 'none', border: 'none', outline: 'none', color: '#f0f0f5', fontSize: 14, fontFamily: 'Inter,sans-serif' }}
+              placeholder="Search subjects by keyword…"
+              style={{
+                flex: 1,
+                background: 'none',
+                border: 'none',
+                outline: 'none',
+                color: 'var(--text)',
+                fontSize: '14px',
+                fontFamily: 'var(--font-body)',
+                fontWeight: 500,
+              }}
             />
           </div>
 
-          {/* Year filter */}
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          {/* Year pills */}
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
             {YEARS.map(y => (
-              <button key={y} onClick={() => setYearFilter(y)}
+              <motion.button
+                key={y}
+                onClick={() => setYearFilter(y)}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
                 style={{
-                  padding: '10px 16px', borderRadius: 10, cursor: 'pointer',
-                  fontFamily: 'Bebas Neue,sans-serif', fontSize: 12, letterSpacing: 2,
-                  background: yearFilter === y ? reg.color : '#0e0e1c',
-                  color: yearFilter === y ? '#fff' : '#555566',
-                  border: `1px solid ${yearFilter === y ? reg.color : '#ffffff0f'}`,
-                  transition: 'all 0.2s ease',
-                }}>
+                  padding: '8px 16px',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  fontFamily: 'var(--font-accent)',
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  letterSpacing: '1px',
+                  background: yearFilter === y ? reg.color : 'rgba(255, 255, 255, 0.65)',
+                  color: yearFilter === y ? '#fff' : 'var(--text-2)',
+                  border: `1px solid ${yearFilter === y ? reg.color : 'rgba(91, 108, 255, 0.15)'}`,
+                  boxShadow: yearFilter === y ? `0 4px 14px ${reg.color}35` : 'var(--shadow-sm)',
+                  transition: 'all 0.25s ease',
+                }}
+              >
                 {y}
-              </button>
+              </motion.button>
             ))}
           </div>
-        </div>
+        </motion.div>
 
-        {/* Subject Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px,1fr))', gap: 14 }}>
-          {filtered.map((s, i) => (
-            <div
-              key={s.id}
-              onClick={() => navigate(`/student/${regId}/${s.id}`)}
-              onMouseEnter={() => setHovered(s.id)}
-              onMouseLeave={() => setHovered(null)}
-              style={{
-                background: hovered === s.id ? reg.color + '11' : '#0e0e1c',
-                border: `1px solid ${hovered === s.id ? reg.color + '44' : '#ffffff0f'}`,
-                borderRadius: 14, padding: '20px',
-                cursor: 'pointer',
-                transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)',
-                transform: hovered === s.id ? 'translateY(-4px)' : 'translateY(0)',
-                boxShadow: hovered === s.id ? `0 12px 30px ${reg.color}15` : 'none',
-                animation: `fadeUp 0.4s ${i * 0.05}s ease both`,
-              }}
-            >
-              <div style={{ fontFamily: 'Syne,sans-serif', fontSize: 14, fontWeight: 700, color: '#f0f0f5', marginBottom: 8, lineHeight: 1.4 }}>
-                {s.name}
-              </div>
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 100, background: reg.color + '22', color: reg.color, border: `1px solid ${reg.color}33` }}>{s.year}</span>
-<span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 100, background: '#ffffff08', color: '#ffffff40', border: '1px solid #ffffff0f' }}>{s.sem}</span>
-{s.reg && <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 100, background: '#00e5c011', color: '#00e5c0', border: '1px solid #00e5c033' }}>{s.reg}</span>}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {filtered.length === 0 && (
-          <div style={{ textAlign: 'center', padding: '60px 0', color: '#555566' }}>
-            <div style={{ fontSize: 40, marginBottom: 16 }}>🔍</div>
-            <div style={{ fontFamily: 'Bebas Neue,sans-serif', fontSize: 20, letterSpacing: 2 }}>NO SUBJECTS FOUND</div>
-            <p style={{ fontSize: 13, marginTop: 8 }}>Try a different search term</p>
+        {/* Loading Spinner */}
+        {loading && (
+          <div style={{ textAlign: 'center', padding: '60px 0' }}>
+            <div style={{
+              width: '32px',
+              height: '32px',
+              border: `3px solid ${reg.color}18`,
+              borderTopColor: reg.color,
+              borderRadius: '50%',
+              animation: 'spin 0.8s linear infinite',
+              margin: '0 auto 12px',
+            }} />
           </div>
+        )}
+
+        {/* Subject Cards Grid */}
+        {!loading && (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '18px' }}>
+            <AnimatePresence mode="popLayout">
+              {filtered.map((s, i) => {
+                const isCardHovered = hovered === s.id
+                return (
+                  <motion.div
+                    key={s.id}
+                    custom={i}
+                    variants={cardVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="exit"
+                    layout
+                    onClick={() => navigate(`/student/${regId}/${s.id}`)}
+                    onMouseEnter={() => setHovered(s.id)}
+                    onMouseLeave={() => setHovered(null)}
+                    whileHover={{ y: -5, scale: 1.015 }}
+                    style={{
+                      background: isCardHovered ? reg.color + '09' : 'rgba(255, 255, 255, 0.65)',
+                      backdropFilter: 'blur(20px)',
+                      border: `1px solid ${isCardHovered ? reg.color + '35' : 'rgba(255, 255, 255, 0.45)'}`,
+                      borderRadius: '16px',
+                      padding: '24px 22px',
+                      cursor: 'pointer',
+                      boxShadow: isCardHovered ? `0 12px 32px ${reg.color}12` : 'var(--shadow-sm)',
+                      position: 'relative',
+                      overflow: 'hidden',
+                      transition: 'border-color 0.25s, background 0.25s, box-shadow 0.25s',
+                    }}
+                  >
+                    {/* Left Accent indicator */}
+                    <div style={{
+                      position: 'absolute',
+                      left: 0,
+                      top: '20%',
+                      bottom: '20%',
+                      width: '3px',
+                      borderRadius: '0 3px 3px 0',
+                      background: isCardHovered ? reg.color : 'transparent',
+                      transition: 'background 0.3s',
+                    }} />
+
+                    {/* Title */}
+                    <div style={{
+                      fontFamily: 'var(--font-heading)',
+                      fontSize: '16px',
+                      fontWeight: 800,
+                      color: 'var(--text)',
+                      marginBottom: '14px',
+                      lineHeight: 1.35,
+                      letterSpacing: '-0.2px',
+                    }}>
+                      {s.name}
+                    </div>
+
+                    {/* Tags Footer */}
+                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: 'auto' }}>
+                      <span style={{
+                        fontSize: '10px',
+                        fontFamily: 'var(--font-accent)',
+                        padding: '3px 10px',
+                        borderRadius: '100px',
+                        background: reg.color + '15',
+                        color: reg.color,
+                        border: `1px solid ${reg.color}25`,
+                        fontWeight: 700,
+                      }}>
+                        {s.year}
+                      </span>
+                      <span style={{
+                        fontSize: '10px',
+                        padding: '3px 10px',
+                        borderRadius: '100px',
+                        background: 'rgba(91, 108, 255, 0.05)',
+                        color: 'var(--text-3)',
+                        border: '1px solid rgba(91, 108, 255, 0.08)',
+                        fontWeight: 500,
+                      }}>
+                        {s.semester}
+                      </span>
+                    </div>
+                  </motion.div>
+                )
+              })}
+            </AnimatePresence>
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!loading && filtered.length === 0 && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            style={{ textAlign: 'center', padding: '64px 0', color: 'var(--text-3)' }}
+          >
+            <div style={{ fontSize: '48px', marginBottom: '16px' }}>🔍</div>
+            <h4 style={{
+              fontFamily: 'var(--font-heading)',
+              fontSize: '20px',
+              fontWeight: 700,
+              color: 'var(--text-2)',
+              marginBottom: '8px',
+            }}>
+              No Subjects Matches
+            </h4>
+            <p style={{ fontSize: '13px' }}>Refine search strings or reset filters.</p>
+          </motion.div>
         )}
       </div>
 
       <AIAssistant />
-      <style>{`@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }`}</style>
     </div>
   )
 }

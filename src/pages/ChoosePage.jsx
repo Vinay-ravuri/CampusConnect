@@ -2,7 +2,254 @@ import AIAssistant from '../components/AIAssistant'
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { motion, AnimatePresence } from 'framer-motion'
 import LoginModal from '../components/LoginModal'
+import PremiumBackground3D from '../components/PremiumBackground3D'
+
+const CARDS = [
+  {
+    id: 'student',
+    path: '/student',
+    emoji: '📚',
+    label: 'STUDENT PORTAL',
+    sub: 'Resource Center',
+    desc: 'JNTUK · AU · University Regulations',
+    detail: 'Access organized syllabus-based study guides, lecture videos, and critical exam questions structured unit by unit.',
+    color: '#FF9A3D',
+    glow: 'rgba(255, 154, 61, 0.16)',
+    border: 'rgba(255, 154, 61, 0.35)',
+    items: ['University Syllabi & Regulations', 'Curated Academic Resource PDFs', 'Important Doubts & Q&A Topics'],
+  },
+  {
+    id: 'placement',
+    path: '/placement',
+    emoji: '💼',
+    label: 'PLACEMENT PORTAL',
+    sub: 'Preparation Suite',
+    desc: 'Aptitude · Reasoning · Technical · Mock Interviews',
+    detail: 'Master technical questions, interview roadmaps, and aptitude benchmarks tailored to premium corporate standard requirements.',
+    color: '#FFB84D',
+    glow: 'rgba(255, 184, 77, 0.16)',
+    border: 'rgba(255, 184, 77, 0.35)',
+    items: ['Structured Coding Roadmaps', 'Interactive Company Modules', 'Quantitative Aptitude Practice'],
+  },
+  {
+    id: 'skills',
+    path: '/placement',
+    emoji: '⚡',
+    label: 'SKILL PORTAL',
+    sub: 'Skills Suite',
+    desc: 'Technical & Practical Skill Development',
+    detail: 'Hone your technical skills, master modern frameworks, and build a strong portfolio to stand out to recruiters.',
+    color: '#FFB84D',
+    glow: 'rgba(255, 184, 77, 0.16)',
+    border: 'rgba(255, 184, 77, 0.35)',
+    items: ['Web Development Tracks', 'Programming Language Mastery', 'DSA & Algorithms Practice'],
+  },
+  {
+    id: 'career',
+    path: '/career',
+    emoji: '✨',
+    label: 'AI CAREER ASSISTANT',
+    sub: 'Career Workspace',
+    desc: 'Resume Analysis · Learning Roadmap · Skill Gap Radar',
+    detail: 'Harness the power of AI to analyze your resume, get placement readiness score, discover skill gaps, and view custom roadmap.',
+    color: '#FF7A00',
+    glow: 'rgba(255, 122, 0, 0.16)',
+    border: 'rgba(255, 122, 0, 0.35)',
+    items: ['Automated ATS Resume Scoring', 'Skill Gap Radar Visualizations', 'Interactive Workspace AI Mentor'],
+  },
+]
+
+function TiltCard({ card, onClick, isLoggedIn }) {
+  const cardRef = useRef(null)
+  const [rotate, setRotate] = useState({ x: 0, y: 0 })
+  const [glowPos, setGlowPos] = useState({ x: 0, y: 0 })
+  const [isHovered, setIsHovered] = useState(false)
+
+  const handleMouseMove = (e) => {
+    if (!cardRef.current) return
+    const { clientX, clientY } = e
+    const rect = cardRef.current.getBoundingClientRect()
+    const x = (clientX - rect.left) / rect.width
+    const y = (clientY - rect.top) / rect.height
+
+    // Calculate dynamic 3D rotation angles
+    const tiltX = (y - 0.5) * -14
+    const tiltY = (x - 0.5) * 14
+    setRotate({ x: tiltX, y: tiltY })
+    setGlowPos({ x: clientX - rect.left, y: clientY - rect.top })
+  }
+
+  const handleMouseLeave = () => {
+    setIsHovered(false)
+    setRotate({ x: 0, y: 0 })
+  }
+
+  return (
+    <motion.div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={handleMouseLeave}
+      onClick={onClick}
+      animate={{
+        rotateX: rotate.x,
+        rotateY: rotate.y,
+        scale: isHovered ? 1.025 : 1,
+      }}
+      transition={{ type: 'spring', stiffness: 200, damping: 22 }}
+      style={{
+        position: 'relative',
+        background: 'rgba(255, 255, 255, 0.65)',
+        backdropFilter: 'blur(28px)',
+        border: `1px solid ${isHovered ? card.border : 'rgba(255, 255, 255, 0.45)'}`,
+        borderRadius: '24px',
+        padding: '48px 40px',
+        cursor: 'pointer',
+        boxShadow: isHovered 
+          ? `0 32px 80px ${card.glow}, 0 0 0 1px ${card.border}`
+          : 'var(--shadow-md)',
+        overflow: 'hidden',
+        transformStyle: 'preserve-3d',
+        perspective: 1000,
+        transition: 'border-color 0.25s, box-shadow 0.25s',
+      }}
+    >
+      {/* Light spotlight dynamic glow */}
+      {isHovered && (
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          background: `radial-gradient(circle 280px at ${glowPos.x}px ${glowPos.y}px, ${card.glow} 0%, transparent 80%)`,
+          pointerEvents: 'none',
+          zIndex: 0,
+        }} />
+      )}
+
+      {/* Top light beam decoration */}
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: '2px',
+        background: `linear-gradient(90deg, transparent, ${card.color}, transparent)`,
+        opacity: isHovered ? 1 : 0,
+        transition: 'opacity 0.3s ease',
+        zIndex: 1,
+      }} />
+
+      {/* Inner card content wrapper preserving 3D depth */}
+      <div style={{ transform: 'translateZ(30px)', position: 'relative', zIndex: 2 }}>
+        {/* Emoji Icon */}
+        <motion.div
+          animate={{ scale: isHovered ? 1.15 : 1, y: isHovered ? -4 : 0 }}
+          style={{
+            fontSize: '56px',
+            marginBottom: '28px',
+            display: 'inline-block',
+            filter: isHovered ? `drop-shadow(0 4px 12px ${card.glow})` : 'none',
+          }}
+        >
+          {card.emoji}
+        </motion.div>
+
+        {/* Title & Sub */}
+        <h3 style={{
+          fontFamily: 'var(--font-heading)',
+          fontWeight: 800,
+          fontSize: '32px',
+          letterSpacing: '-1px',
+          color: card.color,
+          lineHeight: 1.1,
+          marginBottom: '4px',
+        }}>
+          {card.label}
+        </h3>
+        
+        <div style={{
+          fontFamily: 'var(--font-accent)',
+          fontSize: '11px',
+          color: 'var(--text-3)',
+          letterSpacing: '2px',
+          fontWeight: 600,
+          textTransform: 'uppercase',
+          marginBottom: '22px',
+        }}>
+          {card.sub}
+        </div>
+
+        {/* Divider line */}
+        <div style={{
+          height: '1px',
+          background: `linear-gradient(90deg, ${card.color}35, transparent)`,
+          marginBottom: '22px',
+        }} />
+
+        {/* Description */}
+        <p style={{
+          fontSize: '14px',
+          color: 'var(--text-2)',
+          lineHeight: '1.7',
+          marginBottom: '28px',
+          fontWeight: 400,
+        }}>
+          {card.detail}
+        </p>
+
+        {/* Bullet Points */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '36px' }}>
+          {card.items.map((item, idx) => (
+            <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{
+                width: '6px',
+                height: '6px',
+                borderRadius: '50%',
+                background: card.color,
+                boxShadow: `0 0 8px ${card.color}`,
+                flexShrink: 0,
+              }} />
+              <span style={{ fontSize: '13px', color: 'var(--text-2)', fontWeight: 500 }}>
+                {item}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        {/* Enter Prompt Footer */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto' }}>
+          <span style={{
+            fontSize: '12px',
+            fontFamily: 'var(--font-accent)',
+            letterSpacing: '1.5px',
+            color: card.color,
+            textTransform: 'uppercase',
+            fontWeight: 700,
+          }}>
+            {isLoggedIn ? 'Access Portal' : 'Authentication Required'}
+          </span>
+          <motion.div
+            animate={{ x: isHovered ? 6 : 0, borderColor: isHovered ? card.color : 'rgba(255, 154, 61, 0.15)' }}
+            style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '50%',
+              border: `1.5px solid rgba(255, 154, 61, 0.15)`,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: card.color,
+              fontSize: '16px',
+            }}
+          >
+            →
+          </motion.div>
+        </div>
+      </div>
+    </motion.div>
+  )
+}
 
 export default function ChoosePage() {
   const navigate = useNavigate()
@@ -10,206 +257,147 @@ export default function ChoosePage() {
   const [visible, setVisible] = useState(false)
   const [showLogin, setShowLogin] = useState(false)
   const [target, setTarget] = useState('')
-  const [hovered, setHovered] = useState(null)
-  const canvasRef = useRef(null)
-
-  useEffect(() => { setTimeout(() => setVisible(true), 100) }, [])
 
   useEffect(() => {
-    const canvas = canvasRef.current
-    const ctx = canvas.getContext('2d')
-    let W = canvas.width = window.innerWidth
-    let H = canvas.height = window.innerHeight
-    let animId
-    const pts = Array.from({ length: 50 }, () => ({
-      x: Math.random() * W, y: Math.random() * H,
-      vx: (Math.random() - 0.5) * 0.2,
-      vy: (Math.random() - 0.5) * 0.2,
-      r: Math.random() * 1.2 + 0.3,
-      c: ['#4f8aff', '#00e5c0', '#a855f7'][~~(Math.random() * 3)],
-    }))
-    function tick() {
-      ctx.clearRect(0, 0, W, H)
-      pts.forEach(p => {
-        p.x += p.vx; p.y += p.vy
-        if (p.x < 0 || p.x > W) p.vx *= -1
-        if (p.y < 0 || p.y > H) p.vy *= -1
-        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2)
-        ctx.fillStyle = p.c; ctx.globalAlpha = 0.4; ctx.fill()
-      })
-      ctx.globalAlpha = 1
-      animId = requestAnimationFrame(tick)
-    }
-    tick()
-    const onResize = () => { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight }
-    window.addEventListener('resize', onResize)
-    return () => { cancelAnimationFrame(animId); window.removeEventListener('resize', onResize) }
+    setTimeout(() => setVisible(true), 150)
   }, [])
 
   const handleClick = (path) => {
-    if (!isLoggedIn) { setTarget(path); setShowLogin(true) }
-    else navigate(path)
+    if (!isLoggedIn) {
+      setTarget(path)
+      setShowLogin(true)
+    } else {
+      navigate(path)
+    }
   }
 
-  const cards = [
-    {
-      id: 'student',
-      path: '/student',
-      emoji: '📚',
-      label: 'STUDENT',
-      sub: 'RESOURCES PORTAL',
-      desc: 'JNTU · AU · University Regulations',
-      detail: 'Access syllabus-based PDFs, YouTube lectures, and important exam topics unit by unit.',
-      color: '#4f8aff',
-      gradient: 'linear-gradient(135deg, #4f8aff22 0%, #4f8aff05 100%)',
-      glow: '#4f8aff',
-      items: ['JNTU Regulation', 'AU Regulation', 'University Syllabus'],
-    },
-    {
-      id: 'placement',
-      path: '/placement',
-      emoji: '💼',
-      label: 'PLACEMENT',
-      sub: 'PREPARATION PORTAL',
-      desc: 'Aptitude · Reasoning · Technical · Companies',
-      detail: 'Company-wise questions, interview roadmaps, aptitude & reasoning prep all in one place.',
-      color: '#00e5c0',
-      gradient: 'linear-gradient(135deg, #00e5c022 0%, #00e5c005 100%)',
-      glow: '#00e5c0',
-      items: ['Aptitude & Reasoning', 'Core Technical Subjects', 'Company-Wise Prep'],
-    },
-  ]
-
   return (
-    <div style={{ position: 'fixed', inset: 0, background: '#04040a', overflow: 'hidden', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-      <canvas ref={canvasRef} style={{ position: 'absolute', inset: 0, zIndex: 0 }} />
+    <div style={{
+      position: 'relative',
+      minHeight: '100vh',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      overflowX: 'hidden',
+    }}>
+      {/* 3D Dynamic Background */}
+      <PremiumBackground3D />
 
-      {/* Orbs */}
-      <div style={{ position: 'absolute', width: 800, height: 800, borderRadius: '50%', background: 'radial-gradient(circle, #4f8aff08 0%, transparent 70%)', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', zIndex: 1, pointerEvents: 'none' }} />
-
-      {/* Top nav */}
-      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10, padding: '20px 40px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #ffffff06' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }} onClick={() => navigate('/welcome')}>
-          <div style={{ width: 32, height: 32, borderRadius: 8, background: 'linear-gradient(135deg,#4f8aff,#a855f7)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ fontFamily: 'Bebas Neue,sans-serif', fontSize: 13, color: '#fff' }}>CC</span>
-          </div>
-          <span style={{ fontFamily: 'Bebas Neue,sans-serif', fontSize: 14, letterSpacing: 3, color: '#ffffff40' }}>CAMPUSCONNECT</span>
-        </div>
-        <span style={{ fontSize: 11, color: '#ffffff20', letterSpacing: 2 }}>SELECT YOUR PORTAL</span>
-      </div>
-
-      {/* Main */}
+      {/* Glow Center Decoration */}
       <div style={{
-        position: 'relative', zIndex: 2,
-        display: 'flex', flexDirection: 'column',
-        alignItems: 'center', gap: 48,
-        opacity: visible ? 1 : 0,
-        transform: visible ? 'translateY(0)' : 'translateY(40px)',
-        transition: 'all 0.9s cubic-bezier(0.4,0,0.2,1)',
-        padding: '0 24px', width: '100%', maxWidth: 1000,
+        position: 'absolute',
+        width: '800px',
+        height: '800px',
+        borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(255, 154, 61, 0.05) 0%, transparent 70%)',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%,-50%)',
+        zIndex: 1,
+        pointerEvents: 'none',
+      }} />
+
+      {/* Main Header / Selection Title */}
+      <div style={{
+        position: 'relative',
+        zIndex: 2,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '48px',
+        padding: '100px 24px 60px',
+        width: '100%',
+        maxWidth: '1020px',
       }}>
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={visible ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          style={{ textAlign: 'center' }}
+        >
+          <span style={{
+            fontSize: '11px',
+            fontFamily: 'var(--font-accent)',
+            letterSpacing: '4px',
+            color: 'var(--accent)',
+            textTransform: 'uppercase',
+            marginBottom: '16px',
+            fontWeight: 700,
+            display: 'block',
+          }}>
+            — SELECT YOUR ECOSYSTEM —
+          </span>
+          <h2 style={{
+            fontFamily: 'var(--font-heading)',
+            fontWeight: 800,
+            fontSize: 'clamp(32px, 5.5vw, 64px)',
+            letterSpacing: '-2px',
+            color: 'var(--text)',
+            lineHeight: 1.05,
+            textTransform: 'uppercase',
+          }}>
+            Choose Your{' '}
+            <span className="luxury-gradient-text">Path</span>
+          </h2>
+        </motion.div>
 
-        {/* Heading */}
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 11, letterSpacing: '4px', color: '#4f8aff', textTransform: 'uppercase', marginBottom: 16 }}>
-            — Choose Your Path —
-          </div>
-          <div style={{ fontFamily: 'Bebas Neue,sans-serif', fontSize: 'clamp(36px,6vw,72px)', letterSpacing: 4, color: '#f0f0f5', lineHeight: 1 }}>
-            WHERE DO YOU WANT TO GO?
-          </div>
-        </div>
-
-        {/* Cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 24, width: '100%' }}>
-          {cards.map((card) => (
-            <div
+        {/* Portal cards grid */}
+        <motion.div
+          initial="hidden"
+          animate={visible ? 'visible' : 'hidden'}
+          variants={{
+            hidden: {},
+            visible: { transition: { staggerChildren: 0.15 } }
+          }}
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))',
+            gap: '32px',
+            width: '100%',
+          }}
+        >
+          {CARDS.map(card => (
+            <motion.div
               key={card.id}
-              onClick={() => handleClick(card.path)}
-              onMouseEnter={() => setHovered(card.id)}
-              onMouseLeave={() => setHovered(null)}
-              style={{
-                background: hovered === card.id ? card.gradient : '#0e0e1c',
-                border: `1px solid ${hovered === card.id ? card.color + '44' : '#ffffff0f'}`,
-                borderRadius: 20,
-                padding: '40px 36px',
-                cursor: 'pointer',
-                transition: 'all 0.4s cubic-bezier(0.4,0,0.2,1)',
-                transform: hovered === card.id ? 'translateY(-8px) scale(1.02)' : 'translateY(0) scale(1)',
-                boxShadow: hovered === card.id ? `0 24px 60px ${card.glow}20, 0 0 0 1px ${card.glow}22` : '0 8px 32px #00000040',
-                position: 'relative', overflow: 'hidden',
+              variants={{
+                hidden: { opacity: 0, y: 40 },
+                visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] } }
               }}
             >
-              {/* Top glow line */}
-              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg, transparent, ${card.color}, transparent)`, opacity: hovered === card.id ? 1 : 0, transition: 'opacity 0.3s ease' }} />
-
-              {/* Corner decoration */}
-              <div style={{ position: 'absolute', top: -30, right: -30, width: 120, height: 120, borderRadius: '50%', background: `radial-gradient(circle, ${card.color}15 0%, transparent 70%)`, transition: 'all 0.4s ease', transform: hovered === card.id ? 'scale(1.5)' : 'scale(1)' }} />
-
-              {/* Emoji icon */}
-              <div style={{ fontSize: 48, marginBottom: 24, display: 'block',
-                filter: hovered === card.id ? `drop-shadow(0 0 16px ${card.color})` : 'none',
-                transition: 'filter 0.3s ease',
-                transform: hovered === card.id ? 'scale(1.1)' : 'scale(1)',
-              }}>
-                {card.emoji}
-              </div>
-
-              {/* Label */}
-              <div style={{ fontFamily: 'Bebas Neue,sans-serif', fontSize: 42, letterSpacing: 4, color: card.color, lineHeight: 1, marginBottom: 4 }}>
-                {card.label}
-              </div>
-              <div style={{ fontFamily: 'Bebas Neue,sans-serif', fontSize: 16, letterSpacing: 4, color: '#ffffff40', marginBottom: 20 }}>
-                {card.sub}
-              </div>
-
-              {/* Divider */}
-              <div style={{ height: 1, background: `linear-gradient(90deg, ${card.color}44, transparent)`, marginBottom: 20 }} />
-
-              {/* Detail */}
-              <p style={{ fontSize: 13, color: '#555566', lineHeight: 1.7, marginBottom: 24, fontWeight: 300 }}>
-                {card.detail}
-              </p>
-
-              {/* Items */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 32 }}>
-                {card.items.map((item) => (
-                  <div key={item} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <div style={{ width: 4, height: 4, borderRadius: '50%', background: card.color, flexShrink: 0 }} />
-                    <span style={{ fontSize: 12, color: '#ffffff50', letterSpacing: 1 }}>{item}</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* CTA */}
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: 11, letterSpacing: 3, color: card.color, textTransform: 'uppercase', fontWeight: 500 }}>
-                  {isLoggedIn ? 'Enter Portal' : 'Sign in to Access'}
-                </span>
-                <div style={{
-                  width: 36, height: 36, borderRadius: '50%',
-                  border: `1px solid ${card.color}44`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: card.color, fontSize: 16,
-                  transform: hovered === card.id ? 'translateX(4px)' : 'translateX(0)',
-                  transition: 'transform 0.3s ease',
-                }}>→</div>
-              </div>
-            </div>
+              <TiltCard
+                card={card}
+                onClick={() => handleClick(card.path)}
+                isLoggedIn={isLoggedIn}
+              />
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
-        {/* Bottom hint */}
-        <p style={{ fontSize: 11, color: '#ffffff15', letterSpacing: 2, textAlign: 'center' }}>
-          {isLoggedIn ? 'CLICK ANY CARD TO ENTER' : '🔒  SIGN IN REQUIRED TO ACCESS PORTALS'}
-        </p>
+        {/* Subtext info */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={visible ? { opacity: 1 } : {}}
+          transition={{ delay: 0.8 }}
+          style={{
+            fontSize: '11px',
+            fontFamily: 'var(--font-accent)',
+            color: 'var(--text-4)',
+            letterSpacing: '2px',
+            textAlign: 'center',
+            marginTop: '16px',
+          }}
+        >
+          {isLoggedIn ? '✦ CHOOSE ANY PORTAL TO LAUNCH THE ECOSYSTEM ✦' : '🔒 SECURE IDENTITY GATE: SIGN IN REQUIRED TO PROCEED'}
+        </motion.p>
       </div>
 
-      {showLogin && (
-        <LoginModal
-          onClose={() => setShowLogin(false)}
-          redirectTo={target}
-        />
-      )}
+      {/* Floating Login Gate modal */}
+      <AnimatePresence>
+        {showLogin && <LoginModal onClose={() => setShowLogin(false)} redirectTo={target} />}
+      </AnimatePresence>
+
+      {/* Contextual AI assistant drawer */}
       <AIAssistant />
     </div>
   )
