@@ -1,0 +1,45 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: campusconnect-backend
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/campusconnect}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: ${DB_DRIVER:org.postgresql.Driver}
+
+  jpa:
+    database-platform: ${DB_DIALECT:org.hibernate.dialect.PostgreSQLDialect}
+    hibernate:
+      ddl-auto: validate # Hibernate strictly validates schema created by Flyway; NEVER creates/drops tables automatically
+    show-sql: false
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:campusconnect_super_secret_jwt_key_for_engineering_students_2026_ap_ecosystem_key}
+    expiration-ms: 86400000 # 24 Hours
+
+  ai:
+    gemini:
+      api-key: ${VITE_GEMINI_API_KEY:}
+      model-url: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+logging:
+  level:
+    root: INFO
+    com.campusconnect: INFO
+    org.flywaydb: INFO
