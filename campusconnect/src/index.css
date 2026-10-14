@@ -14,6 +14,34 @@
   --cc-white:        #FFFFFF;
   --cc-warm-bg:      #FFF9F0;
   
+  /* ── Module Identity System (Per PDF Reference) ── */
+  /* Module 1: Student Resources (Warm Academic Amber/Orange) */
+  --mod-academic:          #F97316;
+  --mod-academic-light:    #FDBA12;
+  --mod-academic-bg:       rgba(249, 115, 22, 0.08);
+  --mod-academic-border:   rgba(249, 115, 22, 0.22);
+
+  /* Module 2: Placement Preparation (Green / Coding Identity) */
+  --mod-placement:         #10B981;
+  --mod-placement-dark:    #059669;
+  --mod-placement-bg:      rgba(16, 185, 129, 0.08);
+  --mod-placement-border:  rgba(16, 185, 129, 0.22);
+  --mod-placement-glow:    rgba(16, 185, 129, 0.25);
+
+  /* Module 3: Jobs & Internships (Professional Blue Identity) */
+  --mod-jobs:              #2563EB;
+  --mod-jobs-light:        #3B82F6;
+  --mod-jobs-bg:           rgba(37, 99, 235, 0.08);
+  --mod-jobs-border:       rgba(37, 99, 235, 0.20);
+  --mod-jobs-glow:         rgba(37, 99, 235, 0.25);
+
+  /* Module 4: AI Career Assistant (Intelligence Blue/Cyan Identity) */
+  --mod-ai:                #0284C7;
+  --mod-ai-light:          #38BDF8;
+  --mod-ai-bg:             rgba(2, 132, 199, 0.08);
+  --mod-ai-border:         rgba(2, 132, 199, 0.20);
+  --mod-ai-glow:           rgba(2, 132, 199, 0.25);
+
   /* Subtle Blue Accents for Jobs / AI Analytics */
   --cc-blue:         #2563EB;
   --cc-blue-light:   #3B82F6;
@@ -772,6 +800,99 @@ input:focus, textarea:focus, select:focus {
   opacity: 0.25;
 }
 
+/* ─── STUDENT RESOURCE PORTAL REGULATION GRID ─── */
+.cc-regulation-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+
+@media (max-width: 1024px) {
+  .cc-regulation-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (max-width: 640px) {
+  .cc-regulation-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+/* ─── PLACEMENT PREPARATION COURSE GRID (STRICT 4-COL DESKTOP) ─── */
+.cc-placement-course-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+
+@media (max-width: 1280px) {
+  .cc-placement-course-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (max-width: 960px) {
+  .cc-placement-course-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .cc-placement-course-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+/* ─── PLACEMENT SIDEBAR & MOBILE CONTROLS ─── */
+@media (max-width: 1023px) {
+  .placement-desktop-sidebar {
+    display: none !important;
+  }
+  .placement-mobile-btn {
+    display: flex !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .placement-desktop-sidebar {
+    display: block !important;
+  }
+  .placement-mobile-btn {
+    display: none !important;
+  }
+}
+
+/* ─── JOBS & INTERNSHIPS 3-COLUMN RESPONSIVE LAYOUT ─── */
+.cc-jobs-layout {
+  display: flex;
+  gap: 22px;
+  align-items: flex-start;
+}
+
+@media (max-width: 1120px) {
+  .cc-jobs-layout {
+    flex-wrap: wrap;
+  }
+  .cc-jobs-right-col {
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
+    gap: 16px !important;
+  }
+}
+
+@media (max-width: 1023px) {
+  .cc-browse-sidebar {
+    display: none !important;
+  }
+}
+
 /* ─── ACCESSIBILITY: PREFERS-REDUCED-MOTION ─── */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -783,4 +904,5 @@ input:focus, textarea:focus, select:focus {
     scroll-behavior: auto !important;
   }
 }
+
 

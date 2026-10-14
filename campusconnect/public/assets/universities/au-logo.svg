@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="160" height="160">
+  <defs>
+    <filter id="auGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#DC2626" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+  <!-- Outer Shield / Crest -->
+  <path d="M80,8 C120,8 144,30 144,72 C144,116 112,144 80,154 C48,144 16,116 16,72 C16,30 40,8 80,8 Z" 
+        fill="#FFFFFF" stroke="#B91C1C" stroke-width="5" filter="url(#auGlow)"/>
+  <path d="M80,16 C114,16 136,36 136,72 C136,110 108,136 80,146 C52,136 24,110 24,72 C24,36 46,16 80,16 Z" 
+        fill="#FEF2F2" stroke="#EF4444" stroke-width="1.8"/>
+
+  <!-- University Name Banner Curve -->
+  <path id="auTextPath" d="M 32,54 C 54,32 106,32 128,54" fill="none"/>
+  <text font-family="'Inter', sans-serif" font-size="7" font-weight="800" fill="#991B1B" letter-spacing="1">
+    <textPath href="#auTextPath" startOffset="50%" text-anchor="middle">
+      ANDHRA UNIVERSITY
+    </textPath>
+  </text>
+
+  <!-- Center Emblem (Rising Sun over Ocean & Ocean Boat) -->
+  <g transform="translate(80,88)">
+    <!-- Sun Rays & Sun -->
+    <path d="M0,-24 L0,-16 M-14,-18 L-8,-12 M14,-18 L8,-12 M-20,-8 L-14,-6 M20,-8 L14,-6" 
+          stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="0" cy="-6" r="14" fill="#F59E0B"/>
+    
+    <!-- Ocean Waves -->
+    <path d="M-36,12 Q-18,6 0,12 Q18,18 36,12" stroke="#2563EB" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M-32,18 Q-16,12 0,18 Q16,24 32,18" stroke="#1D4ED8" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    
+    <!-- Ancient Sailing Ship / Galley -->
+    <path d="M-18,6 C-14,14 14,14 18,6 L22,6 C16,18 -16,18 -22,6 Z" fill="#991B1B"/>
+    <line x1="0" y1="4" x2="0" y2="-12" stroke="#7F1D1D" stroke-width="2"/>
+    <path d="M0,-10 L10,-4 L0,2 Z" fill="#DC2626"/>
+  </g>
+  <!-- Motto banner -->
+  <rect x="42" y="126" width="76" height="15" rx="7" fill="#991B1B"/>
+  <text x="80" y="137" font-family="'Inter', sans-serif" font-size="6.5" font-weight="700" fill="#FFFFFF" text-anchor="middle" letter-spacing="0.8">
+    VISAKHAPATNAM
+  </text>
+</svg>

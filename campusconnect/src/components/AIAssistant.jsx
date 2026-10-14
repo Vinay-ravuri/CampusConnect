@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import api from '../api/axios'
 
 const DEFAULT_PROMPTS = [
   '📘 Explain DBMS Normalization',
@@ -12,6 +13,7 @@ const DEFAULT_PROMPTS = [
 export default function AIAssistant({
   variant = 'pill',
   contextTitle = 'Student Resource Portal',
+  subtitle = '',
   contextPrompts = [
     'Help me choose my regulation',
     'Find my subjects',
@@ -24,7 +26,7 @@ export default function AIAssistant({
   const [messages, setMessages] = useState([
     {
       role: 'ai',
-      text: `Hi! 👋 I'm **CampusConnect AI** — your study companion for **${contextTitle}**.\n\nAsk me about syllabus, regulations, subjects, exam notes, lab manuals, or interview preparation!`,
+      text: `Hi! 👋 I'm **CampusConnect AI** — your career and study companion for **${contextTitle}**.\n\nAsk me about technical topics, syllabus, interview preparation, resume questions, or career guidance!`,
     }
   ])
   const [input, setInput] = useState('')
@@ -46,37 +48,36 @@ export default function AIAssistant({
   const send = async (text) => {
     const userMsg = (text || input).trim()
     if (!userMsg) return
-    setMessages(m => [...m, { role: 'user', text: userMsg }])
+    const updatedMessages = [...messages, { role: 'user', text: userMsg }]
+    setMessages(updatedMessages)
     setInput('')
     setLoading(true)
     setShowSuggestions(false)
 
     try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': import.meta.env.VITE_ANTHROPIC_KEY || '',
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true',
-        },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1000,
-          system: `You are CampusConnect AI assistant for engineering students in Andhra Pradesh, India. Help with JNTU/AU syllabus, subjects, exam topics, placement preparation, aptitude, reasoning, technical subjects like DBMS, DSA, CN, OS. Keep answers short, clear and student-friendly. Use bullet points when helpful. Add emojis for clarity.`,
-          messages: [
-            ...messages.map(m => ({ role: m.role === 'ai' ? 'assistant' : 'user', content: m.text })),
-            { role: 'user', content: userMsg }
-          ],
-        }),
+      const response = await api.post('/ai/chat', {
+        message: userMsg,
+        context: contextTitle,
+        history: updatedMessages.slice(-6).map(m => ({
+          role: m.role === 'ai' ? 'assistant' : 'user',
+          text: m.text
+        }))
       })
-      const data = await res.json()
-      const aiText = data.content?.find(b => b.type === 'text')?.text || 'Sorry, try again!'
-      setMessages(m => [...m, { role: 'ai', text: aiText }])
-    } catch {
-      setMessages(m => [...m, { role: 'ai', text: '⚠️ Connection error. Please check your connection and try again.' }])
+
+      const reply = response.data?.reply || response.data?.text || 'Here is what you need to know.'
+      setMessages(m => [...m, { role: 'ai', text: reply }])
+    } catch (err) {
+      console.error('AI chat error:', err)
+      setMessages(m => [
+        ...m,
+        {
+          role: 'ai',
+          text: 'AI service is temporarily unavailable. Please try again in a moment.'
+        }
+      ])
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   const handleKey = (e) => {
@@ -138,7 +139,7 @@ export default function AIAssistant({
                   Campus AI
                 </div>
                 <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.75)', letterSpacing: '0.5px' }}>
-                  Always online · Powered by Claude Sonnet
+                  Always online · Powered by Gemini 2.0 AI
                 </div>
               </div>
 
@@ -327,14 +328,26 @@ export default function AIAssistant({
         >
           <div
             style={{
-              width: 40, height: 40, borderRadius: '50%',
-              background: 'linear-gradient(135deg, #FDBA12 0%, #F97316 100%)',
+              width: 38, height: 38, borderRadius: '50%',
+              background: '#F97316',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 4px 14px rgba(249, 115, 22, 0.35)',
-              fontSize: '18px', flexShrink: 0,
+              boxShadow: '0 4px 12px rgba(249, 115, 22, 0.35)',
+              flexShrink: 0,
             }}
           >
-            {open ? '✕' : '✨'}
+            {open ? (
+              <span style={{ color: '#FFFFFF', fontSize: '16px', fontWeight: 'bold' }}>✕</span>
+            ) : (
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <rect x="4" y="6" width="16" height="13" rx="4" fill="#111827" />
+                <circle cx="8.5" cy="11.5" r="2" fill="#FFFFFF" />
+                <circle cx="15.5" cy="11.5" r="2" fill="#FFFFFF" />
+                <line x1="12" y1="2" x2="12" y2="6" stroke="#111827" strokeWidth="2.2" strokeLinecap="round" />
+                <circle cx="12" cy="2" r="1.5" fill="#FDBA12" />
+                <rect x="2" y="10" width="2" height="5" rx="1" fill="#111827" />
+                <rect x="20" y="10" width="2" height="5" rx="1" fill="#111827" />
+              </svg>
+            )}
           </div>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             <span style={{
@@ -348,17 +361,20 @@ export default function AIAssistant({
               fontSize: '10px', fontWeight: 500, color: '#6B7280',
               letterSpacing: '0.2px',
             }}>
-              Your Study Companion
+              {subtitle || (contextTitle.includes('Jobs') || contextTitle.includes('Career') ? 'Your Career Companion' : 'Your Study Companion')}
             </span>
           </div>
           <motion.div
             animate={{ rotate: open ? 180 : 0 }}
             transition={{ duration: 0.2 }}
             style={{
-              fontSize: '11px', color: '#F97316', fontWeight: 800, marginLeft: 4,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: '#111827', marginLeft: 8,
             }}
           >
-            ▲
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="18 15 12 9 6 15" />
+            </svg>
           </motion.div>
         </motion.button>
       ) : (

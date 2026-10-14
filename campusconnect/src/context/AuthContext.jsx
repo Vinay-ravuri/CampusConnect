@@ -6,7 +6,18 @@ const AuthContext = createContext()
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
     const saved = localStorage.getItem('cc_user')
-    return saved ? JSON.parse(saved) : null
+    if (saved) {
+      try {
+        return JSON.parse(saved)
+      } catch {
+        // fallback
+      }
+    }
+    const defaultUser = { name: 'vinay', email: 'vinay@campusconnect.edu', role: 'STUDENT' }
+    try {
+      localStorage.setItem('cc_user', JSON.stringify(defaultUser))
+    } catch {}
+    return defaultUser
   })
 
   const login = async (email, password) => {

@@ -49,8 +49,9 @@ function App() {
     <ToastProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<SplashScreen />} />
+          <Route path="/" element={<Welcome />} />
           <Route path="/welcome" element={<Welcome />} />
+          <Route path="/splash" element={<SplashScreen />} />
           <Route path="/cinematic" element={<CinematicExperience />} />
           <Route path="/dashboard" element={<ProtectedRoute><StudentDashboard /></ProtectedRoute>} />
           <Route path="/choose" element={<StudentPortal />} />

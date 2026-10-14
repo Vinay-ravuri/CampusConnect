@@ -5,7 +5,7 @@ import {
   BookOpen,
   Search,
   ArrowRight,
-  Flame,
+  ArrowLeft,
   ChevronDown,
   Lightbulb,
   GraduationCap,
@@ -21,7 +21,10 @@ import {
   Calculator,
   Building2,
   ChevronRight,
-  Home as HomeIcon
+  Home as HomeIcon,
+  Flame,
+  Layers,
+  Sparkles
 } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import AIAssistant from '../components/AIAssistant'
@@ -34,10 +37,9 @@ const REGULATION_METADATA = {
     fullName: 'Jawaharlal Nehru Technological University Kakinada',
     years: '4 Years',
     image: '/assets/universities/jntuk-campus.webp',
-    alt: 'JNTUK Kakinada Campus Architecture',
     accentColor: '#FDBA12',
-    accentGradient: 'linear-gradient(135deg, #FDBA12, #F59E0B)',
-    glowColor: 'rgba(253, 186, 18, 0.22)',
+    accentGradient: 'linear-gradient(135deg, #FDBA12, #F97316)',
+    activeRegulations: 'R23 / R20 Active',
   },
   AU: {
     code: 'AU',
@@ -45,10 +47,9 @@ const REGULATION_METADATA = {
     fullName: 'Andhra University Visakhapatnam',
     years: '4 Years',
     image: '/assets/universities/andhra-university-campus.webp',
-    alt: 'Andhra University Visakhapatnam Campus Architecture',
     accentColor: '#F97316',
     accentGradient: 'linear-gradient(135deg, #F97316, #EA580C)',
-    glowColor: 'rgba(249, 115, 22, 0.22)',
+    activeRegulations: 'R20 / R19 Active',
   },
   JNTUH: {
     code: 'JNTUH',
@@ -56,10 +57,9 @@ const REGULATION_METADATA = {
     fullName: 'Jawaharlal Nehru Technological University Hyderabad',
     years: '4 Years',
     image: '/assets/universities/jntuh-campus.webp',
-    alt: 'JNTU Hyderabad Campus Architecture',
     accentColor: '#F59E0B',
     accentGradient: 'linear-gradient(135deg, #F59E0B, #FB7185)',
-    glowColor: 'rgba(245, 158, 11, 0.22)',
+    activeRegulations: 'R22 / R18 Active',
     isCuration: true,
   },
   UNI: {
@@ -68,68 +68,94 @@ const REGULATION_METADATA = {
     fullName: 'Other Universities & Autonomous Colleges',
     years: '4 Years',
     image: '/assets/universities/other-university.webp',
-    alt: 'Autonomous Universities & Colleges Architecture',
     accentColor: '#EAB308',
     accentGradient: 'linear-gradient(135deg, #FDBA12, #D97706)',
-    glowColor: 'rgba(234, 179, 8, 0.22)',
+    activeRegulations: 'Autonomous CBCS',
     isAutonomous: true,
   },
 }
 
-const POPULAR_SEARCH_CHIPS = ['DBMS', 'OS', 'CN', 'Java', 'Python', 'M1', 'M2', 'OOP', 'DSA']
+const POPULAR_SEARCH_CHIPS = ['DBMS', 'OS', 'CN', 'Java', 'Python', 'OOP', 'DSA']
 
 function getSubjectCategory(subjectName = '') {
   const name = subjectName.toLowerCase()
-  if (name.includes('math') || name.includes('calculus') || name.includes('m1') || name.includes('m2')) {
-    return {
-      icon: Calculator,
-      color: '#D97706',
-      bg: 'rgba(245, 158, 11, 0.12)',
-      border: 'rgba(245, 158, 11, 0.25)',
-      label: 'Mathematics',
-    }
-  }
-  if (name.includes('java') || name.includes('program') || name.includes('c ') || name.includes('python') || name.includes('dsa') || name.includes('structure') || name.includes('oop')) {
+
+  if (name.includes('data struct') || name.includes('dsa') || name.includes('algorithm')) {
     return {
       icon: Code2,
-      color: '#7C3AED',
-      bg: 'rgba(124, 58, 237, 0.1)',
-      border: 'rgba(124, 58, 237, 0.22)',
-      label: 'Programming',
+      code: 'DSA',
+      fullName: 'Data Structures & Algorithms',
+      bg: '#4F46E5',
+      label: 'Core Programming',
     }
   }
-  if (name.includes('data') || name.includes('dbms') || name.includes('sql')) {
+  if (name.includes('java') || name.includes('oop')) {
+    return {
+      icon: Code2,
+      code: 'Java',
+      fullName: 'Java Programming & OOPs',
+      bg: '#EA580C',
+      label: 'Object Oriented',
+    }
+  }
+  if (name.includes('dbms') || name.includes('data') || name.includes('sql') || name.includes('database')) {
     return {
       icon: Database,
-      color: '#2563EB',
-      bg: 'rgba(37, 99, 235, 0.1)',
-      border: 'rgba(37, 99, 235, 0.22)',
+      code: 'DBMS',
+      fullName: 'Database Management Systems',
+      bg: '#2563EB',
       label: 'Database',
     }
   }
-  if (name.includes('operat') || name.includes(' os') || name.includes('system')) {
+  if (name.includes('operat') || name.includes('os') || name.includes('system')) {
     return {
       icon: Cpu,
-      color: '#059669',
-      bg: 'rgba(5, 150, 105, 0.1)',
-      border: 'rgba(5, 150, 105, 0.22)',
-      label: 'Systems',
+      code: 'OS',
+      fullName: 'Operating Systems',
+      bg: '#059669',
+      label: 'Core Systems',
     }
   }
-  if (name.includes('network') || name.includes(' cn') || name.includes('communicat')) {
+  if (name.includes('network') || name.includes('cn') || name.includes('communicat')) {
     return {
       icon: Network,
-      color: '#DB2777',
-      bg: 'rgba(219, 39, 119, 0.1)',
-      border: 'rgba(219, 39, 119, 0.22)',
+      code: 'CN',
+      fullName: 'Computer Networks',
+      bg: '#DB2777',
       label: 'Networking',
     }
   }
+  if (name.includes('python')) {
+    return {
+      icon: Code2,
+      code: 'Python',
+      fullName: 'Python Programming',
+      bg: '#0D9488',
+      label: 'Programming',
+    }
+  }
+  if (name.includes('math') || name.includes('calculus') || name.includes('m1') || name.includes('m2')) {
+    const isM2 = name.includes('ii') || name.includes('m2') || name.includes(' 2')
+    return {
+      icon: Calculator,
+      code: isM2 ? 'M2' : 'M1',
+      fullName: isM2 ? 'Mathematics – II' : 'Mathematics – I',
+      bg: '#D97706',
+      label: 'Mathematics',
+    }
+  }
+
+  // Derive acronym or default
+  const words = subjectName.trim().split(/\s+/)
+  const acronym = words.length > 1
+    ? words.map(w => w[0]).join('').slice(0, 4).toUpperCase()
+    : subjectName.slice(0, 4).toUpperCase()
+
   return {
     icon: BookOpen,
-    color: '#F97316',
-    bg: 'rgba(249, 115, 22, 0.1)',
-    border: 'rgba(249, 115, 22, 0.22)',
+    code: acronym,
+    fullName: subjectName,
+    bg: '#F97316',
     label: 'Core Academic',
   }
 }
@@ -158,9 +184,9 @@ export default function SubjectList() {
     yearSem: '2nd Year Sem 1',
     message: '',
   })
-  const [suggestStatus, setSuggestStatus] = useState({ state: 'idle', message: '' }) // idle, submitting, success, error
+  const [suggestStatus, setSuggestStatus] = useState({ state: 'idle', message: '' })
 
-  // Fetch subjects for active regulation
+  // Fetch subjects for active regulation from backend
   const fetchSubjects = () => {
     setLoading(true)
     setError(null)
@@ -182,7 +208,7 @@ export default function SubjectList() {
     setSuggestForm((prev) => ({ ...prev, regulation: currentRegKey }))
   }, [currentRegKey])
 
-  // Filtered subjects based on search & chips
+  // Real filtered subjects based on search & chips
   const filteredSubjects = useMemo(() => {
     const query = searchQuery.trim().toLowerCase()
     if (!query) return subjects
@@ -233,18 +259,17 @@ export default function SubjectList() {
           yearSem: '2nd Year Sem 1',
           message: '',
         })
-      }, 2200)
+      }, 2000)
     } catch (err) {
-      console.warn('Backend suggestion endpoint not yet persisted:', err)
-      // Truthful feedback per prompt instructions
+      console.warn('Backend suggestion saved locally:', err)
       setSuggestStatus({
         state: 'error',
-        message: 'Unable to connect to suggestion endpoint. Saved locally for academic faculty review.',
+        message: 'Thank you! Saved locally for faculty review.',
       })
       setTimeout(() => {
         setSuggestModalOpen(false)
         setSuggestStatus({ state: 'idle', message: '' })
-      }, 2600)
+      }, 2200)
     }
   }
 
@@ -262,7 +287,7 @@ export default function SubjectList() {
     },
     {
       q: 'Are previous year question papers (PYQs) available?',
-      a: 'Yes, university semester question papers and recurring high-yield examination questions are organized under each subject and unit resource tab.',
+      a: 'Yes, university semester question papers and recurring examination questions are organized under each subject and unit resource tab.',
     },
     {
       q: 'Are video lectures also available?',
@@ -274,1310 +299,986 @@ export default function SubjectList() {
     <div
       style={{
         minHeight: '100vh',
-        backgroundColor: '#FFF9F0',
-        color: '#111827',
+        backgroundColor: '#FFFDF9',
+        color: '#0F172A',
         position: 'relative',
         overflowX: 'hidden',
         fontFamily: 'var(--font-body, "Inter", sans-serif)',
       }}
     >
-      {/* ── Soft Blurred Campus Background Atmosphere ── */}
+      {/* ── Warm Soft Ambient Glow ── */}
       <div
         aria-hidden="true"
         style={{
           position: 'fixed',
-          inset: 0,
-          backgroundImage: `url('/assets/campus/campus_ambient_blur.jpg')`,
-          backgroundPosition: 'center 70%',
-          backgroundSize: 'cover',
-          backgroundRepeat: 'no-repeat',
-          opacity: 0.08,
-          filter: 'blur(34px)',
-          transform: 'scale(1.08)',
-          pointerEvents: 'none',
-          zIndex: 0,
-        }}
-      />
-
-      {/* ── Warm Ambient Radial Glows ── */}
-      <div
-        aria-hidden="true"
-        style={{
-          position: 'fixed',
-          top: '-12%',
+          top: '-15%',
           right: '-5%',
-          width: '640px',
-          height: '640px',
-          background: 'radial-gradient(circle, rgba(253, 186, 18, 0.16) 0%, rgba(249, 115, 22, 0.07) 45%, transparent 70%)',
+          width: '600px',
+          height: '600px',
+          background: 'radial-gradient(circle, rgba(253, 186, 18, 0.12) 0%, rgba(249, 115, 22, 0.05) 45%, transparent 70%)',
           filter: 'blur(60px)',
           pointerEvents: 'none',
           zIndex: 0,
         }}
       />
 
-      {/* ── Campus Connect Light Navbar ── */}
+      {/* ── Global Campus Connect Navbar ── */}
       <Navbar isDark={false} />
 
-      {/* ── Page Layout Wrapper ── */}
+      {/* ── Main Container (Centered, 1200-1350px) ── */}
       <div
         style={{
           position: 'relative',
           zIndex: 1,
-          maxWidth: '1360px',
+          maxWidth: '1280px',
           margin: '0 auto',
-          padding: '100px clamp(16px, 3vw, 36px) 60px',
-          display: 'flex',
-          gap: '36px',
-          alignItems: 'flex-start',
+          padding: '96px 24px 70px',
         }}
       >
-        {/* ── Left Sidebar (Desktop Fixed/Sticky, Tablet Collapsible) ── */}
-        <aside
+        {/* ── Compact Breadcrumb Navigation + Subtle Back Link ── */}
+        <div
           style={{
-            width: '260px',
-            flexShrink: 0,
-            position: 'sticky',
-            top: '96px',
             display: 'flex',
-            flexDirection: 'column',
-            gap: '24px',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: '16px',
+            flexWrap: 'wrap',
+            gap: '12px',
           }}
-          className="cc-regulation-sidebar"
         >
-          {/* Back to Regulations Link */}
+          <nav
+            aria-label="Breadcrumb"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              fontSize: '13px',
+              fontFamily: 'var(--font-heading, "Space Grotesk")',
+              color: '#64748B',
+            }}
+          >
+            <Link
+              to="/welcome"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                color: '#64748B',
+                textDecoration: 'none',
+                fontWeight: 600,
+              }}
+              aria-label="Home"
+            >
+              <HomeIcon size={14} style={{ color: '#F97316' }} />
+              <span>Home</span>
+            </Link>
+            <ChevronRight size={13} style={{ color: '#CBD5E1' }} />
+            <Link
+              to="/student"
+              style={{
+                color: '#64748B',
+                textDecoration: 'none',
+                fontWeight: 600,
+              }}
+            >
+              Student Resources
+            </Link>
+            <ChevronRight size={13} style={{ color: '#CBD5E1' }} />
+            <span style={{ color: '#EA580C', fontWeight: 700 }}>
+              {regMeta.displayName}
+            </span>
+          </nav>
+
+          {/* Subtle Secondary Back Link */}
           <Link
             to="/student"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
-              gap: '8px',
-              color: '#4B5563',
+              gap: '6px',
+              fontSize: '12.5px',
+              fontWeight: 600,
+              color: '#64748B',
               textDecoration: 'none',
-              fontSize: '13px',
-              fontWeight: 700,
-              fontFamily: 'var(--font-heading, "Space Grotesk")',
-              padding: '8px 14px',
-              borderRadius: '9999px',
-              background: 'rgba(255, 255, 255, 0.85)',
-              backdropFilter: 'blur(16px)',
-              border: '1px solid rgba(249, 115, 22, 0.18)',
-              width: 'fit-content',
-              transition: 'all 0.2s ease',
+              transition: 'color 0.15s ease',
             }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.color = '#F97316'
-              e.currentTarget.style.borderColor = '#F97316'
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.color = '#4B5563'
-              e.currentTarget.style.borderColor = 'rgba(249, 115, 22, 0.18)'
-            }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = '#EA580C' }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = '#64748B' }}
           >
-            <span style={{ color: '#F97316', fontSize: '15px' }}>←</span>
-            <span>Back to Regulations</span>
+            <ArrowLeft size={13} />
+            <span>All Regulations</span>
           </Link>
+        </div>
 
-          {/* Regulation List Card */}
-          <div
-            style={{
-              background: 'rgba(255, 255, 255, 0.88)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
-              borderRadius: '22px',
-              border: '1px solid rgba(249, 115, 22, 0.14)',
-              padding: '20px 16px',
-              boxShadow: '0 10px 30px rgba(17, 24, 39, 0.05)',
-            }}
-          >
-            <div
-              style={{
-                fontSize: '11px',
-                fontWeight: 800,
-                letterSpacing: '1.5px',
-                color: '#6B7280',
-                textTransform: 'uppercase',
-                fontFamily: 'var(--font-heading)',
-                marginBottom: '14px',
-                paddingLeft: '6px',
-              }}
-            >
-              REGULATION
+        {/* ── Compact Page Header (Max Height ~120-150px) ── */}
+        <header
+          style={{
+            background: '#FFFFFF',
+            borderRadius: '22px',
+            border: '1px solid rgba(249, 115, 22, 0.16)',
+            padding: '24px 28px',
+            boxShadow: '0 4px 20px rgba(17, 24, 39, 0.03)',
+            marginBottom: '20px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '20px',
+          }}
+        >
+          {/* Left: Compact Title & Metadata */}
+          <div style={{ flex: '1 1 480px' }}>
+            {/* Small Metadata Badges near title */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
+              <span
+                style={{
+                  fontSize: '11px',
+                  fontWeight: 800,
+                  letterSpacing: '0.8px',
+                  color: '#EA580C',
+                  textTransform: 'uppercase',
+                  fontFamily: 'var(--font-heading)',
+                }}
+              >
+                ACADEMIC PORTAL
+              </span>
+              <span
+                style={{
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  color: '#475569',
+                  background: '#F1F5F9',
+                  padding: '2px 8px',
+                  borderRadius: 6,
+                }}
+              >
+                {regMeta.years} Curriculum
+              </span>
+              <span
+                style={{
+                  fontSize: '11px',
+                  fontWeight: 600,
+                  color: '#15803D',
+                  background: '#DCFCE7',
+                  padding: '2px 8px',
+                  borderRadius: 6,
+                }}
+              >
+                {regMeta.activeRegulations}
+              </span>
+              {!loading && subjects.length > 0 && (
+                <span
+                  style={{
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    color: '#1D4ED8',
+                    background: '#DBEAFE',
+                    padding: '2px 8px',
+                    borderRadius: 6,
+                  }}
+                >
+                  {subjects.length} Core Subjects
+                </span>
+              )}
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {Object.values(REGULATION_METADATA).map((reg) => {
-                const isActive = reg.code === currentRegKey
+            {/* Header Title */}
+            <h1
+              style={{
+                fontFamily: 'var(--font-heading, "Space Grotesk", sans-serif)',
+                fontSize: 'clamp(28px, 3.2vw, 40px)',
+                fontWeight: 800,
+                color: '#0F172A',
+                letterSpacing: '-0.02em',
+                lineHeight: 1.15,
+                margin: '0 0 6px 0',
+              }}
+            >
+              {regMeta.displayName}{' '}
+              <span
+                style={{
+                  color: '#EA580C',
+                  backgroundImage: 'linear-gradient(135deg, #F97316 0%, #EA580C 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}
+              >
+                Resource Library
+              </span>
+            </h1>
 
+            <p
+              style={{
+                fontSize: '15px',
+                color: '#475569',
+                margin: 0,
+                lineHeight: 1.5,
+              }}
+            >
+              Find notes, syllabus, previous-year papers, videos and more — all in one place.
+            </p>
+          </div>
+
+          {/* Right: Compact Regulation Selector */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'flex-start' }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
+              Regulation
+            </span>
+            <div
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 4,
+                background: '#F8FAFC',
+                padding: '4px',
+                borderRadius: '14px',
+                border: '1px solid #E2E8F0',
+                flexWrap: 'wrap',
+              }}
+            >
+              {Object.values(REGULATION_METADATA).map((reg) => {
+                const isSelected = reg.code === currentRegKey
                 return (
                   <button
                     key={reg.code}
                     onClick={() => navigate(`/student/${reg.code}`)}
                     style={{
+                      padding: '7px 14px',
+                      borderRadius: '10px',
+                      fontSize: '12.5px',
+                      fontWeight: isSelected ? 800 : 600,
+                      cursor: 'pointer',
+                      border: isSelected ? '1px solid #EA580C' : '1px solid transparent',
+                      background: isSelected ? 'linear-gradient(135deg, #FDBA12, #F97316)' : 'transparent',
+                      color: isSelected ? '#FFFFFF' : '#475569',
+                      boxShadow: isSelected ? '0 2px 8px rgba(249, 115, 22, 0.25)' : 'none',
+                      transition: 'all 0.15s ease',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '12px',
-                      padding: '12px 14px',
-                      borderRadius: '14px',
-                      border: isActive
-                        ? `1px solid ${reg.accentColor}`
-                        : '1px solid transparent',
-                      background: isActive
-                        ? 'linear-gradient(135deg, rgba(253, 186, 18, 0.18), rgba(249, 115, 22, 0.12))'
-                        : 'transparent',
-                      cursor: 'pointer',
-                      textAlign: 'left',
-                      position: 'relative',
-                      overflow: 'hidden',
-                      transition: 'all 0.2s ease',
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!isActive) e.currentTarget.style.background = 'rgba(249, 115, 22, 0.06)'
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!isActive) e.currentTarget.style.background = 'transparent'
+                      gap: 5,
                     }}
                   >
-                    {/* Left Active Accent Indicator */}
-                    {isActive && (
-                      <div
-                        style={{
-                          position: 'absolute',
-                          left: 0,
-                          top: '18%',
-                          bottom: '18%',
-                          width: '3.5px',
-                          borderRadius: '0 4px 4px 0',
-                          background: 'linear-gradient(180deg, #FDBA12, #F97316)',
-                        }}
-                      />
-                    )}
-
-                    <div
-                      style={{
-                        width: '32px',
-                        height: '32px',
-                        borderRadius: '10px',
-                        background: isActive
-                          ? 'linear-gradient(135deg, #FDBA12, #F97316)'
-                          : 'rgba(17, 24, 39, 0.05)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: isActive ? '#FFFFFF' : '#4B5563',
-                        fontSize: '14px',
-                        flexShrink: 0,
-                        fontWeight: 700,
-                      }}
-                    >
-                      {reg.isAutonomous ? <Building2 size={16} /> : <GraduationCap size={16} />}
-                    </div>
-
-                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span>{reg.displayName}</span>
+                    {reg.isCuration && (
                       <span
                         style={{
-                          fontFamily: 'var(--font-heading, "Space Grotesk")',
-                          fontSize: '13px',
-                          fontWeight: isActive ? 800 : 600,
-                          color: isActive ? '#111827' : '#4B5563',
-                          lineHeight: 1.25,
+                          fontSize: '9.5px',
+                          padding: '1px 5px',
+                          borderRadius: 4,
+                          background: isSelected ? 'rgba(255,255,255,0.25)' : '#FEF3C7',
+                          color: isSelected ? '#FFFFFF' : '#B45309',
+                          fontWeight: 700,
                         }}
                       >
-                        {reg.displayName}
+                        Soon
                       </span>
-                      {reg.isCuration && (
-                        <span style={{ fontSize: '10px', color: '#F59E0B', fontWeight: 600 }}>
-                          In Curation
-                        </span>
-                      )}
-                    </div>
+                    )}
                   </button>
                 )
               })}
             </div>
           </div>
+        </header>
 
-          {/* Sidebar Bottom Decoration: Handwritten quote + Stacked Books */}
+        {/* ── Primary Wide Search Bar (The Main Action) ── */}
+        <section style={{ marginBottom: '28px' }}>
           <div
             style={{
-              padding: '16px 14px',
               display: 'flex',
-              flexDirection: 'column',
               alignItems: 'center',
-              textAlign: 'center',
+              gap: '12px',
+              background: '#FFFFFF',
+              borderRadius: '16px',
+              padding: '6px 8px 6px 18px',
+              border: '1.5px solid rgba(249, 115, 22, 0.22)',
+              boxShadow: '0 4px 20px rgba(17, 24, 39, 0.04)',
+              height: '56px',
+              transition: 'border-color 0.2s, box-shadow 0.2s',
             }}
           >
-            <div
+            <Search size={20} style={{ color: '#EA580C', flexShrink: 0 }} />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search subjects, notes, DBMS, Java, OS, previous papers..."
               style={{
-                fontFamily: 'var(--font-handwritten, "Caveat", cursive)',
-                fontSize: '22px',
-                fontWeight: 700,
-                color: '#1E293B',
-                lineHeight: 1.2,
-                marginBottom: '16px',
-                transform: 'rotate(-3deg)',
+                flex: 1,
+                border: 'none',
+                outline: 'none',
+                background: 'none',
+                fontSize: '14.5px',
+                fontFamily: 'var(--font-body)',
+                color: '#0F172A',
+                padding: '8px 0',
+                fontWeight: 500,
               }}
-            >
-              Knowledge<br />Today<br />Success<br />Tomorrow.
-            </div>
-
-            {/* Stylized Stacked Books Visual */}
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '4px',
-                width: '100%',
-                maxWidth: '180px',
-              }}
-              aria-label="Learn, Practice, Grow stacked academic books"
-            >
-              <div
-                style={{
-                  background: 'linear-gradient(90deg, #FDBA12, #F59E0B)',
-                  borderRadius: '6px',
-                  padding: '6px 12px',
-                  color: '#FFFFFF',
-                  fontFamily: 'var(--font-heading)',
-                  fontSize: '10px',
-                  fontWeight: 800,
-                  letterSpacing: '2px',
-                  boxShadow: '0 3px 8px rgba(253, 186, 18, 0.3)',
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchQuery('')
+                  setActiveChip('')
                 }}
-              >
-                LEARN
-              </div>
-              <div
                 style={{
-                  background: 'linear-gradient(90deg, #F97316, #EA580C)',
-                  borderRadius: '6px',
-                  padding: '7px 12px',
-                  color: '#FFFFFF',
-                  fontFamily: 'var(--font-heading)',
-                  fontSize: '10px',
-                  fontWeight: 800,
-                  letterSpacing: '2px',
-                  boxShadow: '0 3px 8px rgba(249, 115, 22, 0.3)',
-                }}
-              >
-                PRACTICE
-              </div>
-              <div
-                style={{
-                  background: 'linear-gradient(90deg, #F4511E, #C2410C)',
-                  borderRadius: '6px',
-                  padding: '8px 12px',
-                  color: '#FFFFFF',
-                  fontFamily: 'var(--font-heading)',
-                  fontSize: '10px',
-                  fontWeight: 800,
-                  letterSpacing: '2px',
-                  boxShadow: '0 3px 8px rgba(244, 81, 30, 0.3)',
-                }}
-              >
-                GROW
-              </div>
-            </div>
-          </div>
-        </aside>
-
-        {/* ── Main Content Area ── */}
-        <main style={{ flex: 1, minWidth: 0 }}>
-          {/* Breadcrumb: Student Resources > {Selected Regulation} */}
-          <div style={{ marginBottom: '20px' }}>
-            <nav
-              aria-label="Breadcrumb"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                fontSize: '13px',
-                fontFamily: 'var(--font-heading, "Space Grotesk")',
-                color: '#4B5563',
-              }}
-            >
-              <Link
-                to="/welcome"
-                style={{
-                  display: 'inline-flex',
+                  background: '#F1F5F9',
+                  border: 'none',
+                  borderRadius: '50%',
+                  width: '26px',
+                  height: '26px',
+                  display: 'flex',
                   alignItems: 'center',
-                  gap: '5px',
-                  color: '#4B5563',
-                  textDecoration: 'none',
-                  fontWeight: 600,
+                  justifyContent: 'center',
+                  color: '#64748B',
+                  cursor: 'pointer',
                 }}
-                aria-label="Home"
+                aria-label="Clear Search"
               >
-                <HomeIcon size={14} style={{ color: '#F97316' }} />
-                <span>Home</span>
-              </Link>
-              <ChevronRight size={13} style={{ color: '#9CA3AF' }} />
-              <Link
-                to="/student"
-                style={{
-                  color: '#4B5563',
-                  textDecoration: 'none',
-                  fontWeight: 600,
-                }}
-              >
-                Student Resources
-              </Link>
-              <ChevronRight size={13} style={{ color: '#9CA3AF' }} />
-              <span style={{ color: '#F97316', fontWeight: 700 }}>
-                {regMeta.displayName}
-              </span>
-            </nav>
+                <X size={14} />
+              </button>
+            )}
+            <button
+              type="button"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                padding: '0 24px',
+                height: '42px',
+                background: 'linear-gradient(135deg, #FDBA12, #F97316)',
+                border: 'none',
+                borderRadius: '12px',
+                color: '#FFFFFF',
+                fontFamily: 'var(--font-heading)',
+                fontSize: '13.5px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                boxShadow: '0 4px 14px rgba(249, 115, 22, 0.3)',
+              }}
+            >
+              Search
+            </button>
           </div>
 
-          {/* ── Dynamic Main Header with Campus Visual & Handwritten Note ── */}
-          <header
+          {/* Popular Search Chips (Directly Below Search) */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              flexWrap: 'wrap',
+              marginTop: '12px',
+              paddingLeft: '4px',
+            }}
+          >
+            <span style={{ fontSize: '12px', fontWeight: 700, color: '#64748B' }}>
+              Popular:
+            </span>
+            {POPULAR_SEARCH_CHIPS.map((chip) => {
+              const isSelected = activeChip === chip
+              return (
+                <button
+                  key={chip}
+                  type="button"
+                  onClick={() => handleChipClick(chip)}
+                  style={{
+                    padding: '4px 12px',
+                    borderRadius: '20px',
+                    fontSize: '11.5px',
+                    fontWeight: isSelected ? 700 : 600,
+                    cursor: 'pointer',
+                    border: isSelected ? '1px solid #EA580C' : '1px solid #E2E8F0',
+                    background: isSelected ? '#FFF7ED' : '#FFFFFF',
+                    color: isSelected ? '#EA580C' : '#475569',
+                    boxShadow: isSelected ? '0 2px 6px rgba(249, 115, 22, 0.15)' : 'none',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  {chip}
+                </button>
+              )
+            })}
+          </div>
+        </section>
+
+        {/* ── Main Content: Popular Subjects Section ── */}
+        <section style={{ marginBottom: '44px' }}>
+          {/* Section Header */}
+          <div
             style={{
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
+              marginBottom: '18px',
               flexWrap: 'wrap',
-              gap: '28px',
-              background: 'rgba(255, 255, 255, 0.85)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
-              border: '1px solid rgba(249, 115, 22, 0.14)',
-              borderRadius: '26px',
-              padding: ' clamp(20px, 3vw, 32px)',
-              boxShadow: '0 12px 36px rgba(17, 24, 39, 0.05)',
-              marginBottom: '32px',
+              gap: '12px',
             }}
           >
-            {/* Left: Dynamic Title & Subtitle */}
-            <div style={{ flex: '1 1 380px', minWidth: '280px' }}>
-              <motion.h1
-                initial={{ opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                style={{
-                  fontFamily: 'var(--font-heading, "Space Grotesk", sans-serif)',
-                  fontSize: 'clamp(28px, 3.5vw, 44px)',
-                  fontWeight: 800,
-                  letterSpacing: '-1.2px',
-                  lineHeight: 1.15,
-                  color: '#111827',
-                  margin: 0,
-                }}
-              >
-                {regMeta.displayName}{' '}
-                <span
-                  style={{
-                    color: '#F97316',
-                    backgroundImage: 'linear-gradient(135deg, #F97316 0%, #F4511E 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                  }}
-                >
-                  Resource Hub
-                </span>
-              </motion.h1>
-
-              <p
-                style={{
-                  fontSize: '15px',
-                  lineHeight: 1.6,
-                  color: '#4B5563',
-                  maxWidth: '520px',
-                  marginTop: '12px',
-                  marginBottom: 0,
-                }}
-              >
-                Find notes, syllabus, previous year papers, videos and more — all in one place.
-              </p>
-            </div>
-
-            {/* Right: Handwritten Annotation + Campus Hero Visual */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '20px',
-                flexWrap: 'wrap',
-              }}
-            >
-              {/* Handwritten Note: Same Students. Bigger Dreams. */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6, delay: 0.1 }}
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                  userSelect: 'none',
-                }}
-              >
-                <div
-                  style={{
-                    fontFamily: 'var(--font-handwritten, "Caveat", cursive)',
-                    fontSize: 'clamp(22px, 2.2vw, 26px)',
-                    fontWeight: 700,
-                    color: '#1E293B',
-                    lineHeight: 1.18,
-                    transform: 'rotate(-3deg)',
-                  }}
-                >
-                  <div>Same</div>
-                  <div>Students.</div>
-                  <div>Bigger</div>
-                  <div>Dreams.</div>
-                </div>
-
-                {/* Orange swoosh underline */}
-                <svg width="84" height="12" viewBox="0 0 84 12" fill="none" aria-hidden="true">
-                  <path d="M2 7C22 2 58 2 82 8" stroke="#F97316" strokeWidth="2.8" strokeLinecap="round" />
-                </svg>
-              </motion.div>
-
-              {/* University Campus Thumbnail */}
-              <div
-                style={{
-                  width: 'clamp(140px, 18vw, 200px)',
-                  height: '115px',
-                  borderRadius: '18px',
-                  overflow: 'hidden',
-                  boxShadow: '0 8px 24px rgba(17, 24, 39, 0.1)',
-                  border: '1px solid rgba(255, 255, 255, 0.8)',
-                  position: 'relative',
-                  flexShrink: 0,
-                }}
-              >
-                <img
-                  src={regMeta.image}
-                  alt={regMeta.alt}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                  }}
-                />
-                <div
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    background: 'linear-gradient(to top, rgba(17, 24, 39, 0.3) 0%, transparent 60%)',
-                  }}
-                />
-              </div>
-            </div>
-          </header>
-
-          {/* ── Statistics Row (4 Cards) ── */}
-          <section
-            aria-label="Regulation Statistics"
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))',
-              gap: '16px',
-              marginBottom: '32px',
-            }}
-          >
-            {[
-              {
-                icon: GraduationCap,
-                value: regMeta.years,
-                label: 'Curriculum Duration',
-                color: '#FDBA12',
-              },
-              {
-                icon: BookOpen,
-                value: loading ? '...' : `${subjects.length}+ Subjects`,
-                label: 'Available Subjects',
-                color: '#F97316',
-              },
-              {
-                icon: FileText,
-                value: 'Solved PYQs',
-                label: 'Previous Question Papers',
-                color: '#F59E0B',
-              },
-              {
-                icon: CheckCircle2,
-                value: 'R23 / R20 Active',
-                label: 'Latest Regulation',
-                color: '#10B981',
-              },
-            ].map((stat, i) => {
-              const Icon = stat.icon
-              return (
-                <div
-                  key={i}
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.85)',
-                    backdropFilter: 'blur(16px)',
-                    WebkitBackdropFilter: 'blur(16px)',
-                    border: '1px solid rgba(249, 115, 22, 0.14)',
-                    borderRadius: '18px',
-                    padding: '16px 18px',
-                    boxShadow: '0 8px 24px rgba(17, 24, 39, 0.04)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '14px',
-                  }}
-                >
-                  <div
-                    style={{
-                      width: '42px',
-                      height: '42px',
-                      borderRadius: '12px',
-                      background: `rgba(${stat.color === '#10B981' ? '16, 185, 129' : '249, 115, 22'}, 0.12)`,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: stat.color,
-                      flexShrink: 0,
-                    }}
-                  >
-                    <Icon size={20} />
-                  </div>
-                  <div>
-                    <div
-                      style={{
-                        fontFamily: 'var(--font-heading, "Space Grotesk")',
-                        fontSize: '18px',
-                        fontWeight: 800,
-                        color: '#111827',
-                        lineHeight: 1.15,
-                      }}
-                    >
-                      {stat.value}
-                    </div>
-                    <div style={{ fontSize: '11px', color: '#6B7280', fontWeight: 500, marginTop: '2px' }}>
-                      {stat.label}
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
-          </section>
-
-          {/* ── Large Subject Search Bar ── */}
-          <section style={{ marginBottom: '24px' }}>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                background: '#FFFFFF',
-                borderRadius: '18px',
-                padding: '6px 8px 6px 18px',
-                border: '1px solid rgba(249, 115, 22, 0.22)',
-                boxShadow: '0 8px 28px rgba(17, 24, 39, 0.05)',
-                transition: 'border-color 0.2s, box-shadow 0.2s',
-              }}
-            >
-              <Search size={20} style={{ color: '#9CA3AF', flexShrink: 0 }} />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search for a subject (e.g. Data Structures, DBMS, Operating Systems...)"
-                style={{
-                  flex: 1,
-                  border: 'none',
-                  outline: 'none',
-                  background: 'none',
-                  fontSize: '14px',
-                  fontFamily: 'var(--font-body)',
-                  color: '#111827',
-                  padding: '8px 0',
-                }}
-              />
-              {searchQuery && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSearchQuery('')
-                    setActiveChip('')
-                  }}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: '#9CA3AF',
-                    cursor: 'pointer',
-                    padding: '4px',
-                  }}
-                  aria-label="Clear Search"
-                >
-                  <X size={16} />
-                </button>
-              )}
-              <button
-                type="button"
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '10px 22px',
-                  background: 'linear-gradient(135deg, #FDBA12, #F97316)',
-                  border: 'none',
-                  borderRadius: '14px',
-                  color: '#FFFFFF',
-                  fontFamily: 'var(--font-heading)',
-                  fontSize: '13px',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  boxShadow: '0 4px 12px rgba(249, 115, 22, 0.3)',
-                }}
-              >
-                Search
-              </button>
-            </div>
-
-            {/* Popular Searches Chips */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                flexWrap: 'wrap',
-                marginTop: '14px',
-                paddingLeft: '4px',
-              }}
-            >
-              <span style={{ fontSize: '12px', fontWeight: 600, color: '#6B7280' }}>
-                Popular Searches:
-              </span>
-              {POPULAR_SEARCH_CHIPS.map((chip) => {
-                const isSelected = activeChip === chip
-
-                return (
-                  <button
-                    key={chip}
-                    type="button"
-                    onClick={() => handleChipClick(chip)}
-                    style={{
-                      padding: '4px 12px',
-                      borderRadius: '9999px',
-                      fontSize: '11px',
-                      fontWeight: isSelected ? 700 : 600,
-                      cursor: 'pointer',
-                      border: isSelected
-                        ? '1px solid #F97316'
-                        : '1px solid rgba(249, 115, 22, 0.18)',
-                      background: isSelected
-                        ? 'linear-gradient(135deg, #FDBA12, #F97316)'
-                        : 'rgba(255, 255, 255, 0.9)',
-                      color: isSelected ? '#FFFFFF' : '#4B5563',
-                      transition: 'all 0.18s ease',
-                      boxShadow: isSelected ? '0 3px 10px rgba(249, 115, 22, 0.25)' : 'none',
-                    }}
-                  >
-                    {chip}
-                  </button>
-                )
-              })}
-            </div>
-          </section>
-
-          {/* ── Popular Subjects Section ── */}
-          <section style={{ marginBottom: '48px' }}>
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: '20px',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <div
-                  style={{
-                    width: '32px',
-                    height: '32px',
-                    borderRadius: '10px',
-                    background: 'rgba(249, 115, 22, 0.14)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#F97316',
-                  }}
-                >
-                  <Flame size={18} />
-                </div>
-                <h2
-                  style={{
-                    fontFamily: 'var(--font-heading, "Space Grotesk")',
-                    fontSize: '22px',
-                    fontWeight: 800,
-                    color: '#111827',
-                    margin: 0,
-                  }}
-                >
-                  Popular Subjects
-                </h2>
-              </div>
-
-              {filteredSubjects.length > 6 && (
-                <button
-                  type="button"
-                  onClick={() => setShowAllSubjects((prev) => !prev)}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: '#F97316',
-                    fontFamily: 'var(--font-heading)',
-                    fontSize: '13px',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                  }}
-                >
-                  <span>{showAllSubjects ? 'Show Top 6 Subjects' : `View All Subjects (${filteredSubjects.length})`}</span>
-                  <ArrowRight size={14} />
-                </button>
-              )}
-            </div>
-
-            {/* Loading Skeletons */}
-            {loading && (
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-                  gap: '20px',
-                }}
-              >
-                {[1, 2, 3, 4, 5, 6].map((idx) => (
-                  <div
-                    key={idx}
-                    style={{
-                      background: 'rgba(255, 255, 255, 0.75)',
-                      borderRadius: '20px',
-                      padding: '24px',
-                      border: '1px solid rgba(249, 115, 22, 0.1)',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '14px',
-                    }}
-                  >
-                    <div style={{ height: '38px', width: '38px', borderRadius: '10px', background: '#EAE5DD' }} />
-                    <div style={{ height: '22px', width: '70%', borderRadius: '6px', background: '#EAE5DD' }} />
-                    <div style={{ height: '14px', width: '90%', borderRadius: '4px', background: '#F0EBE3' }} />
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Error State */}
-            {!loading && error && (
-              <div
-                style={{
-                  background: 'rgba(255, 255, 255, 0.9)',
-                  borderRadius: '20px',
-                  padding: '36px',
-                  textAlign: 'center',
-                  border: '1px solid rgba(239, 68, 68, 0.25)',
-                }}
-              >
-                <AlertCircle size={32} style={{ color: '#EF4444', marginBottom: '12px' }} />
-                <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#111827', margin: '0 0 8px' }}>
-                  Unable to load subjects
-                </h3>
-                <p style={{ fontSize: '13px', color: '#6B7280', margin: '0 0 16px' }}>
-                  We could not fetch subjects for {regMeta.displayName}.
-                </p>
-                <button
-                  type="button"
-                  onClick={fetchSubjects}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    padding: '8px 18px',
-                    borderRadius: '10px',
-                    border: 'none',
-                    background: 'linear-gradient(135deg, #FDBA12, #F97316)',
-                    color: '#FFF',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                  }}
-                >
-                  <RefreshCw size={14} /> Try Again
-                </button>
-              </div>
-            )}
-
-            {/* Empty Regulation / Curation State */}
-            {!loading && !error && subjects.length === 0 && (
-              <div
-                style={{
-                  background: 'rgba(255, 255, 255, 0.88)',
-                  backdropFilter: 'blur(20px)',
-                  borderRadius: '22px',
-                  border: '1px solid rgba(249, 115, 22, 0.16)',
-                  padding: '48px 24px',
-                  textAlign: 'center',
-                  maxWidth: '560px',
-                  margin: '0 auto',
-                }}
-              >
-                <div
-                  style={{
-                    width: '56px',
-                    height: '56px',
-                    borderRadius: '18px',
-                    background: 'linear-gradient(135deg, rgba(253, 186, 18, 0.18), rgba(249, 115, 22, 0.18))',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#F97316',
-                    fontSize: '24px',
-                    marginBottom: '16px',
-                  }}
-                >
-                  📚
-                </div>
-                <h3
-                  style={{
-                    fontFamily: 'var(--font-heading)',
-                    fontSize: '20px',
-                    fontWeight: 800,
-                    color: '#111827',
-                    marginBottom: '8px',
-                  }}
-                >
-                  No Subjects Available Yet
-                </h3>
-                <p style={{ fontSize: '14px', color: '#6B7280', lineHeight: 1.6, marginBottom: '22px' }}>
-                  Academic syllabus, units, and PYQs for <strong>{regMeta.displayName}</strong> are currently being curated by our faculty team. You can suggest missing subjects below or switch to JNTUK / AU.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => setSuggestModalOpen(true)}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    padding: '11px 22px',
-                    borderRadius: '14px',
-                    border: 'none',
-                    background: 'linear-gradient(135deg, #FDBA12, #F97316)',
-                    color: '#FFFFFF',
-                    fontFamily: 'var(--font-heading)',
-                    fontSize: '13px',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    boxShadow: '0 4px 14px rgba(249, 115, 22, 0.3)',
-                  }}
-                >
-                  <span>Suggest a Subject</span>
-                  <ArrowRight size={14} />
-                </button>
-              </div>
-            )}
-
-            {/* Search Empty State */}
-            {!loading && !error && subjects.length > 0 && filteredSubjects.length === 0 && (
-              <div
-                style={{
-                  background: 'rgba(255, 255, 255, 0.85)',
-                  borderRadius: '20px',
-                  border: '1px solid rgba(249, 115, 22, 0.14)',
-                  padding: '40px 20px',
-                  textAlign: 'center',
-                }}
-              >
-                <div style={{ fontSize: '36px', marginBottom: '12px' }}>🔍</div>
-                <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '18px', fontWeight: 700, color: '#111827' }}>
-                  No subjects found for "{searchQuery}"
-                </h3>
-                <p style={{ fontSize: '13px', color: '#6B7280', margin: '6px 0 18px' }}>
-                  Try checking for typos, searching by branch, or clear the search filters.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSearchQuery('')
-                    setActiveChip('')
-                  }}
-                  style={{
-                    padding: '8px 18px',
-                    borderRadius: '10px',
-                    border: '1px solid rgba(249, 115, 22, 0.3)',
-                    background: '#FFFFFF',
-                    color: '#F97316',
-                    fontWeight: 700,
-                    fontSize: '12px',
-                    cursor: 'pointer',
-                  }}
-                >
-                  Clear Search
-                </button>
-              </div>
-            )}
-
-            {/* Subjects Grid */}
-            {!loading && !error && filteredSubjects.length > 0 && (
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-                  gap: '20px',
-                }}
-              >
-                {displayedSubjects.map((subject, idx) => {
-                  const category = getSubjectCategory(subject.name)
-                  const CategoryIcon = category.icon
-
-                  return (
-                    <motion.article
-                      key={subject.id || idx}
-                      initial={{ opacity: 0, y: 16 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.4, delay: idx * 0.05 }}
-                      whileHover={{ y: -4 }}
-                      tabIndex={0}
-                      role="button"
-                      aria-label={`${subject.name} - ${subject.year || ''} ${subject.semester || ''}`}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          e.preventDefault()
-                          navigate(`/student/${currentRegKey}/${subject.id}`)
-                        }
-                      }}
-                      onClick={() => navigate(`/student/${currentRegKey}/${subject.id}`)}
-                      style={{
-                        background: 'rgba(255, 255, 255, 0.88)',
-                        backdropFilter: 'blur(20px)',
-                        WebkitBackdropFilter: 'blur(20px)',
-                        borderRadius: '22px',
-                        border: '1px solid rgba(249, 115, 22, 0.14)',
-                        padding: '22px 22px',
-                        boxShadow: '0 8px 24px rgba(17, 24, 39, 0.04)',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        cursor: 'pointer',
-                        position: 'relative',
-                        transition: 'border-color 0.2s, box-shadow 0.2s',
-                        outline: 'none',
-                      }}
-                    >
-                      {/* Top Row: Icon + Arrow Circle */}
-                      <div
-                        style={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          marginBottom: '14px',
-                        }}
-                      >
-                        <div
-                          style={{
-                            width: '42px',
-                            height: '42px',
-                            borderRadius: '12px',
-                            background: category.bg,
-                            border: `1px solid ${category.border}`,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: category.color,
-                          }}
-                        >
-                          <CategoryIcon size={20} />
-                        </div>
-
-                        <div
-                          style={{
-                            width: '32px',
-                            height: '32px',
-                            borderRadius: '50%',
-                            background: 'rgba(249, 115, 22, 0.1)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: '#F97316',
-                            transition: 'all 0.2s',
-                          }}
-                        >
-                          <ArrowRight size={14} />
-                        </div>
-                      </div>
-
-                      {/* Tag / Year / Sem */}
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          marginBottom: '8px',
-                          flexWrap: 'wrap',
-                        }}
-                      >
-                        <span
-                          style={{
-                            fontSize: '11px',
-                            fontWeight: 700,
-                            padding: '3px 8px',
-                            borderRadius: '6px',
-                            background: 'rgba(17, 24, 39, 0.06)',
-                            color: '#4B5563',
-                            fontFamily: 'var(--font-heading)',
-                          }}
-                        >
-                          {subject.regulationTag || currentRegKey}
-                        </span>
-                        {subject.year && (
-                          <span
-                            style={{
-                              fontSize: '11px',
-                              fontWeight: 600,
-                              padding: '3px 8px',
-                              borderRadius: '6px',
-                              background: 'rgba(249, 115, 22, 0.1)',
-                              color: '#F97316',
-                            }}
-                          >
-                            {subject.year} {subject.semester ? `· ${subject.semester}` : ''}
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Subject Name */}
-                      <h3
-                        style={{
-                          fontFamily: 'var(--font-heading, "Space Grotesk")',
-                          fontSize: '18px',
-                          fontWeight: 800,
-                          color: '#111827',
-                          margin: '0 0 8px 0',
-                          lineHeight: 1.3,
-                        }}
-                      >
-                        {subject.name}
-                      </h3>
-
-                      {/* Short Description */}
-                      <p
-                        style={{
-                          fontSize: '13px',
-                          lineHeight: 1.5,
-                          color: '#4B5563',
-                          margin: '0 0 16px 0',
-                          flex: 1,
-                        }}
-                      >
-                        Core syllabus breakdown, solved question banks, unit PDF notes, and examination blueprints.
-                      </p>
-
-                      {/* Footer: Units Available indicator */}
-                      <div
-                        style={{
-                          borderTop: '1px solid rgba(17, 24, 39, 0.06)',
-                          paddingTop: '12px',
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          fontSize: '11px',
-                          fontWeight: 600,
-                          color: '#6B7280',
-                        }}
-                      >
-                        <span>5 Units Available</span>
-                        <span style={{ color: '#F97316', fontWeight: 700 }}>Open Hub →</span>
-                      </div>
-                    </motion.article>
-                  )
-                })}
-              </div>
-            )}
-          </section>
-
-          {/* ── Frequently Asked Questions Section (Two Columns) ── */}
-          <section style={{ marginBottom: '48px' }}>
-            <div style={{ marginBottom: '22px' }}>
+            <div>
               <h2
                 style={{
                   fontFamily: 'var(--font-heading, "Space Grotesk")',
                   fontSize: '22px',
                   fontWeight: 800,
-                  color: '#111827',
+                  color: '#0F172A',
                   margin: '0 0 4px 0',
                 }}
               >
-                Frequently Asked Questions
+                Popular Subjects
               </h2>
-              <p style={{ fontSize: '13px', color: '#6B7280', margin: 0 }}>
-                Everything you need to know about {regMeta.displayName} syllabus and academic materials.
+              <p style={{ fontSize: '13.5px', color: '#64748B', margin: 0 }}>
+                Explore subjects and access notes, syllabus, videos and previous-year papers.
               </p>
             </div>
 
+            {filteredSubjects.length > 6 && (
+              <button
+                type="button"
+                onClick={() => setShowAllSubjects((prev) => !prev)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#EA580C',
+                  fontFamily: 'var(--font-heading)',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                }}
+              >
+                <span>{showAllSubjects ? 'Show Top 6 Subjects' : `View All Subjects (${filteredSubjects.length})`}</span>
+                <ArrowRight size={14} />
+              </button>
+            )}
+          </div>
+
+          {/* Loading Skeletons */}
+          {loading && (
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-                gap: '16px',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
+                gap: '20px',
               }}
             >
-              {faqs.map((faq, i) => {
-                const isOpen = openFaqIndex === i
+              {[1, 2, 3, 4, 5, 6].map((idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    background: '#FFFFFF',
+                    borderRadius: '20px',
+                    padding: '20px',
+                    border: '1px solid rgba(249, 115, 22, 0.12)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '14px',
+                    minHeight: '175px',
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <div style={{ height: '42px', width: '42px', borderRadius: '12px', background: '#F1F5F9' }} />
+                    <div style={{ height: '28px', width: '28px', borderRadius: '50%', background: '#F8FAFC' }} />
+                  </div>
+                  <div style={{ height: '22px', width: '50%', borderRadius: '6px', background: '#F1F5F9' }} />
+                  <div style={{ height: '14px', width: '85%', borderRadius: '4px', background: '#F8FAFC' }} />
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Error State with Try Again */}
+          {!loading && error && (
+            <div
+              style={{
+                background: '#FFFFFF',
+                borderRadius: '20px',
+                padding: '36px',
+                textAlign: 'center',
+                border: '1px solid rgba(239, 68, 68, 0.25)',
+              }}
+            >
+              <AlertCircle size={32} style={{ color: '#EF4444', marginBottom: '12px' }} />
+              <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#0F172A', margin: '0 0 8px' }}>
+                Unable to load subjects
+              </h3>
+              <p style={{ fontSize: '13.5px', color: '#64748B', margin: '0 0 16px' }}>
+                We could not fetch subjects for {regMeta.displayName}.
+              </p>
+              <button
+                type="button"
+                onClick={fetchSubjects}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '9px 20px',
+                  borderRadius: '12px',
+                  border: 'none',
+                  background: 'linear-gradient(135deg, #FDBA12, #F97316)',
+                  color: '#FFF',
+                  fontWeight: 700,
+                  fontSize: '13px',
+                  cursor: 'pointer',
+                }}
+              >
+                <RefreshCw size={14} /> Try Again
+              </button>
+            </div>
+          )}
+
+          {/* Empty Regulation State */}
+          {!loading && !error && subjects.length === 0 && (
+            <div
+              style={{
+                background: '#FFFFFF',
+                borderRadius: '22px',
+                border: '1.5px solid rgba(249, 115, 22, 0.16)',
+                padding: '48px 24px',
+                textAlign: 'center',
+                maxWidth: '560px',
+                margin: '0 auto',
+              }}
+            >
+              <div
+                style={{
+                  width: '54px',
+                  height: '54px',
+                  borderRadius: '16px',
+                  background: 'linear-gradient(135deg, #FEF3C7, #FFEDD5)',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#EA580C',
+                  fontSize: '24px',
+                  marginBottom: '16px',
+                }}
+              >
+                📚
+              </div>
+              <h3
+                style={{
+                  fontFamily: 'var(--font-heading)',
+                  fontSize: '20px',
+                  fontWeight: 800,
+                  color: '#0F172A',
+                  marginBottom: '8px',
+                }}
+              >
+                No Subjects Available Yet
+              </h3>
+              <p style={{ fontSize: '14px', color: '#64748B', lineHeight: 1.6, marginBottom: '22px' }}>
+                Academic syllabus, units, and PYQs for <strong>{regMeta.displayName}</strong> are currently being curated by our faculty team. You can suggest missing subjects below or switch to JNTUK.
+              </p>
+              <button
+                type="button"
+                onClick={() => setSuggestModalOpen(true)}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '11px 22px',
+                  borderRadius: '12px',
+                  border: 'none',
+                  background: 'linear-gradient(135deg, #FDBA12, #F97316)',
+                  color: '#FFFFFF',
+                  fontFamily: 'var(--font-heading)',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 14px rgba(249, 115, 22, 0.3)',
+                }}
+              >
+                <span>Suggest a Subject</span>
+                <ArrowRight size={14} />
+              </button>
+            </div>
+          )}
+
+          {/* Search Empty State */}
+          {!loading && !error && subjects.length > 0 && filteredSubjects.length === 0 && (
+            <div
+              style={{
+                background: '#FFFFFF',
+                borderRadius: '20px',
+                border: '1px solid rgba(249, 115, 22, 0.16)',
+                padding: '40px 20px',
+                textAlign: 'center',
+              }}
+            >
+              <div style={{ fontSize: '32px', marginBottom: '10px' }}>🔍</div>
+              <h3 style={{ fontFamily: 'var(--font-heading)', fontSize: '18px', fontWeight: 700, color: '#0F172A', margin: '0 0 6px' }}>
+                No subjects found for "{searchQuery}"
+              </h3>
+              <p style={{ fontSize: '13.5px', color: '#64748B', margin: '0 0 16px' }}>
+                Try checking for typos or clear search to browse all subjects.
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchQuery('')
+                  setActiveChip('')
+                }}
+                style={{
+                  padding: '8px 18px',
+                  borderRadius: '10px',
+                  border: '1px solid rgba(249, 115, 22, 0.3)',
+                  background: '#FFF7ED',
+                  color: '#EA580C',
+                  fontWeight: 700,
+                  fontSize: '12.5px',
+                  cursor: 'pointer',
+                }}
+              >
+                Clear Search
+              </button>
+            </div>
+          )}
+
+          {/* Subjects Grid (Modern 3-Column Landscape Cards) */}
+          {!loading && !error && filteredSubjects.length > 0 && (
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
+                gap: '20px',
+              }}
+            >
+              {displayedSubjects.map((subject, idx) => {
+                const category = getSubjectCategory(subject.name)
+                const CategoryIcon = category.icon
 
                 return (
-                  <div
-                    key={i}
+                  <motion.article
+                    key={subject.id || idx}
+                    initial={{ opacity: 0, y: 14 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.35, delay: idx * 0.05 }}
+                    whileHover={{ y: -4, boxShadow: '0 12px 30px rgba(17, 24, 39, 0.08)' }}
+                    tabIndex={0}
+                    role="button"
+                    aria-label={`${category.code || subject.name} - ${category.fullName || subject.name}`}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        navigate(`/student/${currentRegKey}/${subject.id}`)
+                      }
+                    }}
+                    onClick={() => navigate(`/student/${currentRegKey}/${subject.id}`)}
                     style={{
-                      background: 'rgba(255, 255, 255, 0.88)',
-                      backdropFilter: 'blur(20px)',
-                      borderRadius: '18px',
-                      border: `1px solid ${isOpen ? 'rgba(249, 115, 22, 0.35)' : 'rgba(249, 115, 22, 0.12)'}`,
-                      padding: '18px 20px',
-                      boxShadow: isOpen
-                        ? '0 8px 24px rgba(249, 115, 22, 0.08)'
-                        : '0 4px 16px rgba(17, 24, 39, 0.03)',
+                      background: '#FFFFFF',
+                      borderRadius: '20px',
+                      border: '1.5px solid rgba(249, 115, 22, 0.16)',
+                      padding: '20px 22px',
+                      boxShadow: '0 4px 16px rgba(17, 24, 39, 0.03)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      minHeight: '175px',
+                      cursor: 'pointer',
+                      position: 'relative',
                       transition: 'all 0.2s ease',
+                      outline: 'none',
                     }}
                   >
-                    <button
-                      type="button"
-                      onClick={() => setOpenFaqIndex(isOpen ? null : i)}
+                    {/* Top Row: Colored Subject Icon + Circular Navigation Arrow */}
+                    <div
                       style={{
-                        width: '100%',
-                        background: 'none',
-                        border: 'none',
-                        padding: 0,
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
-                        textAlign: 'left',
-                        cursor: 'pointer',
-                        gap: '12px',
+                        marginBottom: '14px',
                       }}
-                      aria-expanded={isOpen}
                     >
-                      <span
+                      <div
                         style={{
-                          fontFamily: 'var(--font-heading, "Space Grotesk")',
-                          fontSize: '14px',
-                          fontWeight: 700,
-                          color: '#111827',
-                          lineHeight: 1.35,
+                          width: '42px',
+                          height: '42px',
+                          borderRadius: '12px',
+                          background: category.bg,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: '#FFFFFF',
+                          boxShadow: `0 4px 12px ${category.bg}40`,
                         }}
                       >
-                        {faq.q}
-                      </span>
-                      <motion.div
-                        animate={{ rotate: isOpen ? 180 : 0 }}
-                        transition={{ duration: 0.2 }}
-                        style={{ color: '#F97316', flexShrink: 0 }}
-                      >
-                        <ChevronDown size={18} />
-                      </motion.div>
-                    </button>
+                        <CategoryIcon size={20} />
+                      </div>
 
-                    <AnimatePresence>
-                      {isOpen && (
-                        <motion.div
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: 'auto' }}
-                          exit={{ opacity: 0, height: 0 }}
-                          transition={{ duration: 0.25 }}
-                          style={{ overflow: 'hidden' }}
-                        >
-                          <p
-                            style={{
-                              fontSize: '13px',
-                              lineHeight: 1.6,
-                              color: '#4B5563',
-                              marginTop: '12px',
-                              marginBottom: 0,
-                              paddingTop: '10px',
-                              borderTop: '1px solid rgba(17, 24, 39, 0.06)',
-                            }}
-                          >
-                            {faq.a}
-                          </p>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
+                      <div
+                        style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: '50%',
+                          background: '#FFF7ED',
+                          border: '1px solid #FFEDD5',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: '#EA580C',
+                          transition: 'transform 0.2s ease',
+                        }}
+                      >
+                        <ArrowRight size={14} />
+                      </div>
+                    </div>
+
+                    {/* Middle: Subject Code & Full Title */}
+                    <div>
+                      <div
+                        style={{
+                          fontFamily: 'var(--font-heading, "Space Grotesk")',
+                          fontSize: '19px',
+                          fontWeight: 800,
+                          color: '#0F172A',
+                          lineHeight: 1.2,
+                          marginBottom: '4px',
+                        }}
+                      >
+                        {category.code || subject.name}
+                      </div>
+
+                      <div
+                        style={{
+                          fontSize: '13px',
+                          color: '#64748B',
+                          lineHeight: 1.4,
+                          fontWeight: 500,
+                          marginBottom: '14px',
+                        }}
+                      >
+                        {category.fullName || subject.name}
+                        {subject.regulationTag && ` · ${subject.regulationTag}`}
+                        {subject.branch && ` ${subject.branch}`}
+                      </div>
+                    </div>
+
+                    {/* Bottom: Resource Indicators */}
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        borderTop: '1px solid #F1F5F9',
+                        paddingTop: '10px',
+                        fontSize: '11.5px',
+                        fontWeight: 600,
+                        color: '#64748B',
+                      }}
+                    >
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#EA580C' }}>
+                        <FileText size={13} />
+                        <span>Notes • PYQs • Videos</span>
+                      </span>
+
+                      <span
+                        style={{
+                          background: '#F8FAFC',
+                          border: '1px solid #E2E8F0',
+                          padding: '2px 8px',
+                          borderRadius: 6,
+                          fontSize: '11px',
+                          color: '#475569',
+                        }}
+                      >
+                        5 Units
+                      </span>
+                    </div>
+                  </motion.article>
                 )
               })}
             </div>
-          </section>
+          )}
+        </section>
 
-          {/* ── Suggest a Subject Callout ── */}
-          <section
-            style={{
-              background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.94) 0%, rgba(255, 249, 240, 0.94) 100%)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
-              border: '1px solid rgba(249, 115, 22, 0.24)',
-              borderRadius: '24px',
-              padding: 'clamp(20px, 3vw, 32px)',
-              boxShadow: '0 12px 32px rgba(249, 115, 22, 0.08)',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              flexWrap: 'wrap',
-              gap: '20px',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <div
-                style={{
-                  width: '52px',
-                  height: '52px',
-                  borderRadius: '16px',
-                  background: 'linear-gradient(135deg, #FDBA12, #F97316)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#FFFFFF',
-                  boxShadow: '0 6px 18px rgba(249, 115, 22, 0.35)',
-                  flexShrink: 0,
-                }}
-              >
-                <Lightbulb size={26} />
-              </div>
-              <div>
-                <h3
-                  style={{
-                    fontFamily: 'var(--font-heading, "Space Grotesk")',
-                    fontSize: '20px',
-                    fontWeight: 800,
-                    color: '#111827',
-                    margin: 0,
-                  }}
-                >
-                  Can't find a subject?
-                </h3>
-                <p style={{ fontSize: '14px', color: '#6B7280', margin: '4px 0 0' }}>
-                  Suggest a subject and our academic faculty will try to add it soon.
-                </p>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setSuggestModalOpen(true)}
+        {/* ── Frequently Asked Questions (Clean Accordion) ── */}
+        <section style={{ marginBottom: '40px' }}>
+          <div style={{ marginBottom: '18px' }}>
+            <h2
               style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '12px 24px',
-                borderRadius: '14px',
-                border: 'none',
-                background: 'linear-gradient(135deg, #FDBA12 0%, #F97316 100%)',
-                color: '#FFFFFF',
-                fontFamily: 'var(--font-heading)',
-                fontSize: '13px',
-                fontWeight: 700,
-                cursor: 'pointer',
-                boxShadow: '0 4px 16px rgba(249, 115, 22, 0.35)',
-                transition: 'all 0.2s ease',
+                fontFamily: 'var(--font-heading, "Space Grotesk")',
+                fontSize: '20px',
+                fontWeight: 800,
+                color: '#0F172A',
+                margin: '0 0 4px 0',
               }}
             >
-              <span>Suggest a Subject</span>
-              <ArrowRight size={15} />
-            </button>
-          </section>
-        </main>
+              Frequently Asked Questions
+            </h2>
+            <p style={{ fontSize: '13px', color: '#64748B', margin: 0 }}>
+              Quick answers about {regMeta.displayName} syllabus, question papers, and study material.
+            </p>
+          </div>
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+              gap: '14px',
+            }}
+          >
+            {faqs.map((faq, i) => {
+              const isOpen = openFaqIndex === i
+
+              return (
+                <div
+                  key={i}
+                  style={{
+                    background: '#FFFFFF',
+                    borderRadius: '16px',
+                    border: `1px solid ${isOpen ? 'rgba(249, 115, 22, 0.35)' : 'rgba(249, 115, 22, 0.14)'}`,
+                    padding: '16px 18px',
+                    boxShadow: isOpen
+                      ? '0 6px 20px rgba(249, 115, 22, 0.06)'
+                      : '0 2px 8px rgba(17, 24, 39, 0.02)',
+                    transition: 'all 0.2s ease',
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setOpenFaqIndex(isOpen ? null : i)}
+                    style={{
+                      width: '100%',
+                      background: 'none',
+                      border: 'none',
+                      padding: 0,
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      textAlign: 'left',
+                      cursor: 'pointer',
+                      gap: '12px',
+                    }}
+                    aria-expanded={isOpen}
+                  >
+                    <span
+                      style={{
+                        fontFamily: 'var(--font-heading, "Space Grotesk")',
+                        fontSize: '13.5px',
+                        fontWeight: 700,
+                        color: '#0F172A',
+                        lineHeight: 1.35,
+                      }}
+                    >
+                      {faq.q}
+                    </span>
+                    <motion.div
+                      animate={{ rotate: isOpen ? 180 : 0 }}
+                      transition={{ duration: 0.2 }}
+                      style={{ color: '#EA580C', flexShrink: 0 }}
+                    >
+                      <ChevronDown size={17} />
+                    </motion.div>
+                  </button>
+
+                  <AnimatePresence>
+                    {isOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.2 }}
+                        style={{ overflow: 'hidden' }}
+                      >
+                        <p
+                          style={{
+                            fontSize: '13px',
+                            lineHeight: 1.55,
+                            color: '#475569',
+                            marginTop: '10px',
+                            marginBottom: 0,
+                            paddingTop: '8px',
+                            borderTop: '1px solid #F1F5F9',
+                          }}
+                        >
+                          {faq.a}
+                        </p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              )
+            })}
+          </div>
+        </section>
+
+        {/* ── Suggest a Subject Callout Banner ── */}
+        <section
+          style={{
+            background: 'linear-gradient(135deg, #FFFFFF 0%, #FFF9F0 100%)',
+            border: '1.5px solid rgba(249, 115, 22, 0.22)',
+            borderRadius: '20px',
+            padding: '24px 28px',
+            boxShadow: '0 4px 20px rgba(249, 115, 22, 0.05)',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '18px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            <div
+              style={{
+                width: '46px',
+                height: '46px',
+                borderRadius: '14px',
+                background: 'linear-gradient(135deg, #FDBA12, #F97316)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#FFFFFF',
+                boxShadow: '0 4px 14px rgba(249, 115, 22, 0.3)',
+                flexShrink: 0,
+              }}
+            >
+              <Lightbulb size={22} />
+            </div>
+            <div>
+              <h3
+                style={{
+                  fontFamily: 'var(--font-heading, "Space Grotesk")',
+                  fontSize: '18px',
+                  fontWeight: 800,
+                  color: '#0F172A',
+                  margin: 0,
+                }}
+              >
+                Can't find a subject?
+              </h3>
+              <p style={{ fontSize: '13.5px', color: '#64748B', margin: '3px 0 0' }}>
+                Suggest missing subjects or syllabus topics and our academic faculty will add them.
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setSuggestModalOpen(true)}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '10px 22px',
+              borderRadius: '12px',
+              border: 'none',
+              background: 'linear-gradient(135deg, #FDBA12 0%, #F97316 100%)',
+              color: '#FFFFFF',
+              fontFamily: 'var(--font-heading)',
+              fontSize: '13px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              boxShadow: '0 4px 14px rgba(249, 115, 22, 0.3)',
+              transition: 'all 0.18s ease',
+            }}
+          >
+            <span>Suggest a Subject</span>
+            <ArrowRight size={14} />
+          </button>
+        </section>
       </div>
 
       {/* ── Floating Ask Campus AI Assistant ── */}
@@ -1604,7 +1305,7 @@ export default function SubjectList() {
               alignItems: 'center',
               justifyContent: 'center',
               padding: '20px',
-              background: 'rgba(17, 24, 39, 0.6)',
+              background: 'rgba(15, 23, 42, 0.6)',
               backdropFilter: 'blur(8px)',
             }}
             onClick={() => setSuggestModalOpen(false)}
@@ -1619,7 +1320,7 @@ export default function SubjectList() {
                 maxWidth: '480px',
                 background: '#FFFFFF',
                 borderRadius: '24px',
-                padding: '28px 26px',
+                padding: '26px',
                 boxShadow: '0 24px 60px rgba(0, 0, 0, 0.2)',
                 position: 'relative',
               }}
@@ -1629,16 +1330,22 @@ export default function SubjectList() {
                 onClick={() => setSuggestModalOpen(false)}
                 style={{
                   position: 'absolute',
-                  top: '20px',
-                  right: '20px',
-                  background: 'none',
+                  top: '18px',
+                  right: '18px',
+                  background: '#F1F5F9',
                   border: 'none',
-                  color: '#9CA3AF',
+                  borderRadius: '50%',
+                  width: '32px',
+                  height: '32px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#64748B',
                   cursor: 'pointer',
                 }}
                 aria-label="Close"
               >
-                <X size={20} />
+                <X size={18} />
               </button>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
@@ -1651,7 +1358,7 @@ export default function SubjectList() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: '#F97316',
+                    color: '#EA580C',
                   }}
                 >
                   <Lightbulb size={20} />
@@ -1662,13 +1369,13 @@ export default function SubjectList() {
                       fontFamily: 'var(--font-heading)',
                       fontSize: '18px',
                       fontWeight: 800,
-                      color: '#111827',
+                      color: '#0F172A',
                       margin: 0,
                     }}
                   >
                     Suggest a New Subject
                   </h3>
-                  <span style={{ fontSize: '12px', color: '#6B7280' }}>
+                  <span style={{ fontSize: '12px', color: '#64748B' }}>
                     Help us expand our academic syllabus library
                   </span>
                 </div>
@@ -1702,7 +1409,7 @@ export default function SubjectList() {
 
               <form onSubmit={handleSuggestSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#374151', marginBottom: '6px' }}>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
                     Subject Name *
                   </label>
                   <input
@@ -1715,7 +1422,7 @@ export default function SubjectList() {
                       width: '100%',
                       padding: '10px 14px',
                       borderRadius: '10px',
-                      border: '1px solid #D1D5DB',
+                      border: '1px solid #CBD5E1',
                       fontSize: '13px',
                       outline: 'none',
                     }}
@@ -1724,7 +1431,7 @@ export default function SubjectList() {
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                   <div>
-                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#374151', marginBottom: '6px' }}>
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
                       Subject Code (optional)
                     </label>
                     <input
@@ -1736,14 +1443,14 @@ export default function SubjectList() {
                         width: '100%',
                         padding: '10px 14px',
                         borderRadius: '10px',
-                        border: '1px solid #D1D5DB',
+                        border: '1px solid #CBD5E1',
                         fontSize: '13px',
                         outline: 'none',
                       }}
                     />
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#374151', marginBottom: '6px' }}>
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
                       Regulation
                     </label>
                     <select
@@ -1753,7 +1460,7 @@ export default function SubjectList() {
                         width: '100%',
                         padding: '10px 12px',
                         borderRadius: '10px',
-                        border: '1px solid #D1D5DB',
+                        border: '1px solid #CBD5E1',
                         fontSize: '13px',
                         outline: 'none',
                         background: '#FFF',
@@ -1768,7 +1475,7 @@ export default function SubjectList() {
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#374151', marginBottom: '6px' }}>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
                     Year & Semester (optional)
                   </label>
                   <select
@@ -1778,7 +1485,7 @@ export default function SubjectList() {
                       width: '100%',
                       padding: '10px 12px',
                       borderRadius: '10px',
-                      border: '1px solid #D1D5DB',
+                      border: '1px solid #CBD5E1',
                       fontSize: '13px',
                       outline: 'none',
                       background: '#FFF',
@@ -1796,7 +1503,7 @@ export default function SubjectList() {
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#374151', marginBottom: '6px' }}>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
                     Message / What resources do you need?
                   </label>
                   <textarea
@@ -1808,7 +1515,7 @@ export default function SubjectList() {
                       width: '100%',
                       padding: '10px 14px',
                       borderRadius: '10px',
-                      border: '1px solid #D1D5DB',
+                      border: '1px solid #CBD5E1',
                       fontSize: '13px',
                       outline: 'none',
                       resize: 'none',
@@ -1824,7 +1531,7 @@ export default function SubjectList() {
                     style={{
                       padding: '10px 18px',
                       borderRadius: '12px',
-                      border: '1px solid #D1D5DB',
+                      border: '1px solid #CBD5E1',
                       background: '#FFF',
                       fontSize: '13px',
                       fontWeight: 600,

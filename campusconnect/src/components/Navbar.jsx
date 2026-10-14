@@ -2,6 +2,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { Home as HomeIcon, BookOpen, Target, Briefcase, Sparkles, GraduationCap } from 'lucide-react'
 import LoginModal from './LoginModal'
 
 export default function Navbar({ isDark }) {
@@ -28,25 +29,46 @@ export default function Navbar({ isDark }) {
     setActiveDropdown(null)
   }, [location.pathname])
 
-  const studentLinks = isLoggedIn 
-    ? [{ label: 'Dashboard', path: '/dashboard', icon: '⚡' }] 
-    : []
-
   const baseLinks = [
-    { label: 'Home', path: '/welcome', icon: '🏠' },
-    ...studentLinks,
-    { label: 'Student Resources', path: '/student', icon: '📚' },
-    { label: 'Placement Preparation', path: '/placement', icon: '💼' },
-    { label: 'Jobs & Internships', path: '/jobs', icon: '🎯' },
-    { label: 'AI Career Assistant', path: '/career', icon: '✨' },
-    { label: 'About', path: '#about', isAbout: true, icon: '✦' },
+    { label: 'Home', path: '/welcome', icon: HomeIcon, isHome: true },
+    { 
+      label: 'Student Resources', 
+      path: '/student', 
+      icon: BookOpen,
+      hasDropdown: true,
+      children: [
+        { label: 'All Regulations', path: '/student', desc: 'Browse JNTUK, AU, JNTUH, Other' },
+        { label: 'JNTUK Resource Hub', path: '/student/JNTUK', desc: 'Syllabus, notes, PYQs' },
+        { label: 'Andhra University (AU)', path: '/student/AU', desc: 'Engineering curriculum' },
+        { label: 'JNTU Hyderabad (JNTUH)', path: '/student/JNTUH', desc: 'Upcoming syllabus' },
+        { label: 'Other Autonomous Colleges', path: '/student/UNI', desc: 'Deemed universities' },
+      ]
+    },
+    { 
+      label: 'Placement Preparation', 
+      path: '/placement', 
+      icon: Target,
+      hasDropdown: true,
+      children: [
+        { label: '7-Stage Roadmap', path: '/placement', desc: 'Complete placement roadmap' },
+        { label: 'Core CS (OS, DBMS, CN)', path: '/placement', desc: 'Core subject notes & interview questions' },
+        { label: 'DSA & Coding Arena', path: '/placement', desc: 'Algorithms & coding patterns' },
+        { label: 'Company Preparation', path: '/placement', desc: 'TCS, Infosys, Wipro, Amazon PYQs' },
+      ]
+    },
+    { label: 'Jobs & Internships', path: '/jobs', icon: Briefcase },
+    { label: 'AI Career Assistant', path: '/career', icon: Sparkles },
+    { label: 'About', path: '#about', isAbout: true },
   ]
-  const links = isAdmin ? [...baseLinks, { label: 'Admin Panel', path: '/admin', icon: '⚙' }] : baseLinks
+  const links = isAdmin ? [...baseLinks, { label: 'Admin Panel', path: '/admin' }] : baseLinks
 
   const handleLinkClick = (link) => {
     if (link.isAbout) { setShowAbout(true); return }
     if (link.label === 'Home') {
-      if (location.pathname === '/welcome') { window.scrollTo({ top: 0, behavior: 'smooth' }); return }
+      if (location.pathname === '/welcome' || location.pathname === '/') {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+        return
+      }
       navigate('/welcome')
     } else {
       navigate(link.path)
@@ -54,7 +76,7 @@ export default function Navbar({ isDark }) {
   }
 
   const isActive = (link) => {
-    if (link.label === 'Home') return location.pathname === '/welcome'
+    if (link.label === 'Home') return location.pathname === '/welcome' || location.pathname === '/' || location.pathname === '/cinematic'
     return link.path && location.pathname.startsWith(link.path) && link.path !== '/welcome'
   }
 
@@ -67,49 +89,55 @@ export default function Navbar({ isDark }) {
         style={{
           position: 'fixed', top: 0, left: 0, right: 0,
           width: '100%',
-          height: scrolled ? '64px' : '76px',
+          height: '74px',
           zIndex: 200,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '0 clamp(16px, 4%, 48px)',
-          background: scrolled
-            ? (isDark ? 'rgba(17, 24, 39, 0.85)' : 'rgba(255, 255, 255, 0.82)')
-            : (isDark ? 'rgba(17, 24, 39, 0.50)' : 'rgba(255, 249, 240, 0.65)'),
-          backdropFilter: 'blur(28px)',
-          WebkitBackdropFilter: 'blur(28px)',
+          padding: '0 clamp(18px, 4.8vw, 68px)',
+          background: isDark
+            ? (scrolled ? 'rgba(5, 7, 11, 0.94)' : 'rgba(0, 0, 0, 0.92)')
+            : (scrolled ? 'rgba(255, 255, 255, 0.92)' : 'rgba(255, 249, 240, 0.88)'),
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
           borderBottom: `1px solid ${
             isDark 
               ? 'rgba(255, 255, 255, 0.08)'
               : 'rgba(249, 115, 22, 0.12)'
           }`,
-          boxShadow: scrolled 
-            ? '0 10px 30px rgba(17, 24, 39, 0.05)'
-            : 'none',
-          transition: 'all 0.35s cubic-bezier(0.22, 1, 0.36, 1)',
+          boxShadow: scrolled ? '0 10px 30px rgba(0, 0, 0, 0.25)' : 'none',
+          transition: 'all 0.3s ease',
         }}
       >
         {/* ── Left: Campus Connect Logo ── */}
         <motion.div
           style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', flexShrink: 0 }}
-          onClick={() => navigate('/welcome')}
+          onClick={() => {
+            if (location.pathname === '/' || location.pathname === '/welcome') {
+              window.scrollTo({ top: 0, behavior: 'smooth' })
+            } else {
+              navigate('/welcome')
+            }
+          }}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.97 }}
         >
           <div
             style={{
-              width: 38, height: 38, borderRadius: 12,
-              background: 'linear-gradient(135deg, #FDBA12 0%, #F97316 60%, #F4511E 100%)',
+              width: 36, height: 36, borderRadius: 10,
+              background: 'linear-gradient(135deg, #FDBA12 0%, #F97316 100%)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 4px 16px rgba(249, 115, 22, 0.35)',
-              fontSize: 19, color: '#fff', flexShrink: 0,
+              boxShadow: '0 4px 14px rgba(249, 115, 22, 0.35)',
+              flexShrink: 0,
             }}
-          >🎓</div>
+          >
+            <GraduationCap size={22} color="#000000" strokeWidth={2.4} />
+          </div>
           <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.15 }}>
             <span style={{
-              fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: 17,
-              letterSpacing: '-0.3px', color: isDark ? '#FFFFFF' : 'var(--text, #111827)',
+              fontFamily: 'var(--font-heading)', fontWeight: 800, fontSize: 16.5,
+              letterSpacing: '-0.2px', color: isDark ? '#FFFFFF' : 'var(--text, #111827)',
               textTransform: 'uppercase',
             }}>
-              CAMPUS<span style={{ color: 'var(--cc-orange, #F97316)' }}>CONNECT</span>
+              CAMPUS<span style={{ color: '#F97316' }}>CONNECT</span>
             </span>
             <span style={{
               fontSize: '10px', fontFamily: 'var(--font-body)', color: isDark ? 'rgba(255,255,255,0.65)' : 'var(--text-3, #4B5563)',
@@ -120,123 +148,224 @@ export default function Navbar({ isDark }) {
           </div>
         </motion.div>
 
-        {/* ── Center: Desktop Nav Links with soft highlighted pill ── */}
+        {/* ── Center: Desktop Nav Links ── */}
         <div
           className="hide-mobile"
-          style={{ display: 'flex', gap: 4, alignItems: 'center' }}
+          style={{ display: 'flex', gap: ' clamp(10px, 1.4vw, 24px)', alignItems: 'center', position: 'relative' }}
         >
-          {links.map(link => {
+          {links.map((link) => {
             const active = isActive(link)
+            const isMenuOpen = activeDropdown === link.label
+            const IconComp = link.icon
+
             return (
-              <motion.button
+              <div
                 key={link.label}
-                onClick={() => handleLinkClick(link)}
-                style={{
-                  position: 'relative',
-                  border: active
-                    ? '1px solid rgba(249, 115, 22, 0.28)'
-                    : '1px solid transparent',
-                  cursor: 'pointer',
-                  padding: '7px 15px',
-                  borderRadius: '100px',
-                  fontFamily: 'var(--font-heading)',
-                  fontSize: '13.5px',
-                  fontWeight: active ? 700 : 500,
-                  color: active
-                    ? 'var(--cc-deep-orange, #F4511E)'
-                    : (isDark ? 'rgba(255, 255, 255, 0.85)' : 'var(--text-2, #374151)'),
-                  background: active
-                    ? 'linear-gradient(135deg, rgba(253, 186, 18, 0.18) 0%, rgba(249, 115, 22, 0.12) 100%)'
-                    : 'transparent',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  boxShadow: active ? '0 2px 8px rgba(249, 115, 22, 0.12)' : 'none',
-                  transition: 'all 0.2s ease',
+                style={{ position: 'relative', display: 'flex', alignItems: 'center' }}
+                onMouseEnter={() => {
+                  if (link.hasDropdown) {
+                    clearTimeout(dropdownTimerRef.current)
+                    setActiveDropdown(link.label)
+                  }
                 }}
-                whileHover={!active ? {
-                  backgroundColor: 'rgba(249, 115, 22, 0.06)',
-                  color: 'var(--cc-orange, #F97316)',
-                } : undefined}
-                whileTap={{ scale: 0.97 }}
+                onMouseLeave={() => {
+                  if (link.hasDropdown) {
+                    dropdownTimerRef.current = setTimeout(() => setActiveDropdown(null), 200)
+                  }
+                }}
               >
-                <span>{link.label}</span>
-              </motion.button>
+                {/* Separator before About */}
+                {link.label === 'About' && (
+                  <span
+                    style={{
+                      display: 'inline-block',
+                      width: '1px',
+                      height: '14px',
+                      background: 'rgba(255, 255, 255, 0.2)',
+                      marginRight: 'clamp(10px, 1.4vw, 20px)',
+                    }}
+                  />
+                )}
+
+                {/* Link Button */}
+                {(() => {
+                  const isPlacement = link.path === '/placement'
+                  const isJobs = link.path === '/jobs'
+                  const activeBg = isDark
+                    ? (isJobs ? 'rgba(37, 99, 235, 0.2)' : isPlacement ? 'rgba(16, 185, 129, 0.15)' : 'rgba(253, 186, 18, 0.12)')
+                    : (isJobs ? '#EBF3FE' : isPlacement ? '#ECFDF5' : '#FEF3C7')
+                  const activeBorder = isDark
+                    ? (isJobs ? '1px solid rgba(37, 99, 235, 0.45)' : isPlacement ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid rgba(253, 186, 18, 0.4)')
+                    : (isJobs ? '1px solid rgba(37, 99, 235, 0.35)' : isPlacement ? '1px solid rgba(16, 185, 129, 0.35)' : '1px solid rgba(245, 158, 11, 0.35)')
+                  const activeColor = isDark
+                    ? (isJobs ? '#60A5FA' : isPlacement ? '#34D399' : '#FDBA12')
+                    : (isJobs ? '#1D4ED8' : isPlacement ? '#047857' : '#1E293B')
+                  const activeIconColor = isJobs ? '#2563EB' : isPlacement ? '#059669' : '#F97316'
+                  const activeShadow = isJobs
+                    ? '0 2px 8px rgba(37, 99, 235, 0.18)'
+                    : isPlacement 
+                    ? '0 2px 8px rgba(16, 185, 129, 0.15)' 
+                    : '0 2px 8px rgba(245, 158, 11, 0.12)'
+
+                  return (
+                    <motion.button
+                      onClick={() => handleLinkClick(link)}
+                      style={{
+                        position: 'relative',
+                        border: active ? activeBorder : 'none',
+                        cursor: 'pointer',
+                        padding: active ? '7px 18px' : '7px 9px',
+                        borderRadius: active ? '100px' : '6px',
+                        fontFamily: 'var(--font-heading)',
+                        fontSize: '14px',
+                        fontWeight: active ? 700 : 500,
+                        color: active
+                          ? activeColor
+                          : (isDark ? 'rgba(255, 255, 255, 0.88)' : '#374151'),
+                        background: active ? activeBg : 'transparent',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        whiteSpace: 'nowrap',
+                        flexShrink: 0,
+                        boxShadow: active ? activeShadow : 'none',
+                        transition: 'all 0.2s ease',
+                      }}
+                      whileHover={!active ? {
+                        color: isPlacement ? '#059669' : '#F97316',
+                      } : undefined}
+                      whileTap={{ scale: 0.97 }}
+                    >
+                      {IconComp && (
+                        <IconComp
+                          size={16}
+                          color={active ? activeIconColor : (isDark ? '#FFFFFF' : '#4B5563')}
+                          strokeWidth={active ? 2.4 : 1.9}
+                        />
+                      )}
+                      <span style={{ whiteSpace: 'nowrap' }}>{link.label}</span>
+                    </motion.button>
+                  )
+                })()}
+
+                {/* Dropdown Menu */}
+                {link.hasDropdown && isMenuOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.96 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.96 }}
+                    transition={{ duration: 0.2 }}
+                    style={{
+                      position: 'absolute',
+                      top: '100%',
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      marginTop: '8px',
+                      minWidth: '240px',
+                      background: isDark ? 'rgba(11, 15, 25, 0.96)' : 'rgba(255, 255, 255, 0.96)',
+                      backdropFilter: 'blur(20px)',
+                      WebkitBackdropFilter: 'blur(20px)',
+                      border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(249, 115, 22, 0.18)'}`,
+                      borderRadius: '16px',
+                      padding: '8px',
+                      boxShadow: '0 16px 36px rgba(0, 0, 0, 0.35)',
+                      zIndex: 300,
+                    }}
+                  >
+                    {link.children.map(child => (
+                      <div
+                        key={child.label}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setActiveDropdown(null)
+                          navigate(child.path)
+                        }}
+                        style={{
+                          padding: '10px 14px',
+                          borderRadius: '10px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '2px',
+                          transition: 'background 0.15s ease',
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(249, 115, 22, 0.08)')}
+                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
+                      >
+                        <span style={{ fontSize: '13px', fontWeight: 600, color: isDark ? '#FFFFFF' : '#111827' }}>
+                          {child.label}
+                        </span>
+                        {child.desc && (
+                          <span style={{ fontSize: '11px', color: isDark ? 'rgba(255,255,255,0.5)' : '#6B7280' }}>
+                            {child.desc}
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                  </motion.div>
+                )}
+              </div>
             )
           })}
         </div>
-
         {/* ── Desktop Actions ── */}
-        <div className="hide-mobile" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          {scrolled && (
-            <motion.button
-              onClick={() => navigate('/choose')}
-              whileHover={{ scale: 1.04, boxShadow: '0 8px 24px rgba(255,122,0,0.25)' }}
-              whileTap={{ scale: 0.96 }}
-              style={{
-                background: 'linear-gradient(135deg, #FF7A00, #FFB800)',
-                border: 'none', borderRadius: 100, padding: '7px 20px',
-                color: '#fff', cursor: 'pointer', fontFamily: 'var(--font-accent)',
-                fontSize: 12, fontWeight: 700,
-                boxShadow: '0 4px 12px rgba(255,122,0,0.18)',
-                display: 'inline-flex', alignItems: 'center', gap: 6,
-              }}
-            >
-              <span>ENTER PORTAL</span>
-              <span style={{ fontSize: 13 }}>→</span>
-            </motion.button>
-          )}
+        <div className="hide-mobile" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
           {isLoggedIn ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
               <div
                 onClick={() => navigate('/dashboard')}
-                title="Go to Student Command Center"
+                title="Student Profile"
                 style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}
               >
-                <motion.div
-                  whileHover={{ scale: 1.1 }}
+                <div
                   style={{
-                    width: 34, height: 34, borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #FDBA12 0%, #F97316 100%)',
+                    width: 30, height: 30, borderRadius: '50%',
+                    background: '#F97316',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontSize: 13, fontWeight: 800, color: '#fff',
-                    boxShadow: '0 2px 10px rgba(249, 115, 22, 0.35)',
+                    boxShadow: '0 2px 8px rgba(249, 115, 22, 0.4)',
                   }}
                 >
-                  {user?.name?.[0]?.toUpperCase()}
-                </motion.div>
-                <span style={{ fontSize: 13, color: isDark ? '#FFFFFF' : 'var(--text, #111827)', fontWeight: 600, fontFamily: 'var(--font-heading)' }}>
-                  {user?.name}
+                  {(user?.name && user.name.toLowerCase() !== 'rajesh kumar') ? user.name[0].toUpperCase() : 'V'}
+                </div>
+                <span style={{ fontSize: 13, color: isDark ? '#FFFFFF' : 'var(--text, #111827)', fontWeight: 500, fontFamily: 'var(--font-heading)' }}>
+                  {(user?.name && user.name.toLowerCase() !== 'rajesh kumar') ? user.name.toLowerCase() : 'vinay'}
                 </span>
               </div>
               <motion.button
                 onClick={logout}
-                whileHover={{ scale: 1.03, backgroundColor: 'rgba(239, 68, 68, 0.08)' }}
+                whileHover={{ scale: 1.03, backgroundColor: 'rgba(239, 68, 68, 0.12)' }}
                 whileTap={{ scale: 0.97 }}
                 style={{
-                  background: 'none', border: '1px solid rgba(239, 68, 68, 0.25)',
-                  borderRadius: '100px', padding: '6px 14px', color: 'var(--danger, #EF4444)',
-                  cursor: 'pointer', fontSize: 12, fontWeight: 600,
-                  fontFamily: 'var(--font-heading)', transition: 'all 0.2s',
+                  background: 'none',
+                  border: '1px solid rgba(239, 68, 68, 0.55)',
+                  borderRadius: '6px',
+                  padding: '4px 14px',
+                  color: '#EF4444',
+                  cursor: 'pointer',
+                  fontSize: 12,
+                  fontWeight: 600,
+                  fontFamily: 'var(--font-heading)',
+                  transition: 'all 0.2s',
                 }}
-              >Logout</motion.button>
+              >
+                Logout
+              </motion.button>
             </div>
           ) : (
             <motion.button
               onClick={() => setShowLogin(true)}
-              whileHover={{ scale: 1.04, boxShadow: '0 8px 24px rgba(249, 115, 22, 0.35)' }}
-              whileTap={{ scale: 0.96 }}
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
               style={{
-                background: 'var(--grad-main, linear-gradient(135deg, #FDBA12 0%, #F97316 60%, #F4511E 100%))',
-                border: 'none', borderRadius: 100, padding: '9px 24px',
+                background: 'linear-gradient(135deg, #FDBA12 0%, #F97316 100%)',
+                border: 'none', borderRadius: 8, padding: '7px 20px',
                 color: '#fff', cursor: 'pointer', fontFamily: 'var(--font-heading)',
                 fontSize: 13, fontWeight: 700,
                 boxShadow: '0 4px 16px rgba(249, 115, 22, 0.25)',
-                display: 'inline-flex', alignItems: 'center', gap: 7,
-                position: 'relative', overflow: 'hidden',
               }}
             >
-              <span>Login</span>
+              Login
             </motion.button>
           )}
         </div>
