@@ -57,6 +57,18 @@ export default function MockInterviewModal({ isOpen, onClose, savedResumeName })
   const recognitionRef = useRef(null)
   const isSpeakingRef = useRef(false)
 
+  // Clean up speech synthesis & recognition on unmount
+  useEffect(() => {
+    return () => {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel()
+      }
+      if (recognitionRef.current) {
+        recognitionRef.current.stop()
+      }
+    }
+  }, [])
+
   if (!isOpen) return null
 
   // ── Speech Synthesis Helpers ──
@@ -209,13 +221,53 @@ export default function MockInterviewModal({ isOpen, onClose, savedResumeName })
       }, 600)
     } catch (err) {
       console.error('Session create error:', err)
-      const fallbackQuestions = [
-        { id: 1, text: `Welcome to your ${targetRole} interview. Could you introduce yourself and walk me through your primary technical skills?` },
-        { id: 2, text: `Looking at your experience with Java & Spring Boot, how did you handle authentication and database persistence in your projects?` },
-        { id: 3, text: `Suppose your API starts throwing 500 errors under heavy student traffic. Walk me step-by-step through how you investigate.` },
-        { id: 4, text: `How do you ensure clean component state management and modularity on the React frontend?` },
-        { id: 5, text: `Do you have any questions for me regarding this engineering role?` },
-      ]
+      const getModeQuestions = (mode, role) => {
+        if (mode === 'HR') {
+          return [
+            { id: 1, text: `Hello! Tell me about yourself, your career ambitions, and what drew you to this ${role} position.` },
+            { id: 2, text: `Can you describe a challenging team disagreement you encountered in a university project and how you resolved it constructively?` },
+            { id: 3, text: `Where do you see yourself technically in the next 2 to 3 years, and what skills do you plan to master?` },
+            { id: 4, text: `How do you handle critical project deadlines when unexpected blockers or bugs occur right before launch?` },
+            { id: 5, text: `Why should our engineering organization choose to hire you for this role?` },
+          ]
+        }
+        if (mode === 'Coding') {
+          return [
+            { id: 1, text: `Let's start with algorithms. How would you find the longest substring without repeating characters in optimal O(N) time?` },
+            { id: 2, text: `Suppose you have two sorted arrays and need to merge them in O(1) extra space. What pointer technique do you employ?` },
+            { id: 3, text: `How do you detect a cycle in a singly linked list? Explain the logic behind Floyd's Tortoise and Hare algorithm.` },
+            { id: 4, text: `When would you choose a Breadth-First Search (BFS) over a Depth-First Search (DFS) for graph traversal?` },
+            { id: 5, text: `Analyze the time and space complexity trade-offs between QuickSort and MergeSort under worst-case scenarios.` },
+          ]
+        }
+        if (mode === 'SystemDesign') {
+          return [
+            { id: 1, text: `How would you architect a high-scale URL shortener service like TinyURL handling 50 million daily redirects?` },
+            { id: 2, text: `Walk me through how you would implement caching using Redis. How do you mitigate cache avalanche and cache penetration?` },
+            { id: 3, text: `Explain horizontal vs vertical database scaling, and how database read replicas and sharding work.` },
+            { id: 4, text: `How do you ensure stateless authentication and session resilience across multiple microservices with JWT?` },
+            { id: 5, text: `What architectural strategy ensures zero downtime during relational database schema upgrades?` },
+          ]
+        }
+        if (mode === 'Behavioral') {
+          return [
+            { id: 1, text: `Tell me about a complex project you built from scratch. What was your personal contribution and the measurable outcome?` },
+            { id: 2, text: `Give an example of when you had to learn an unfamiliar technical tool or language within just a few days.` },
+            { id: 3, text: `Describe a situation where a code review or senior mentor gave you tough criticism. How did you handle it?` },
+            { id: 4, text: `How do you prioritize concurrent academic deadlines, internships, and technical preparation?` },
+            { id: 5, text: `Share an example where you took the initiative to fix a bug or improve system performance without being asked.` },
+          ]
+        }
+        return [
+          { id: 1, text: `Welcome to your ${role} interview. Could you introduce yourself and walk me through your technical stack?` },
+          { id: 2, text: `Looking at your experience, how do you handle state management, API synchronization, and database transactions?` },
+          { id: 3, text: `Suppose your backend starts throwing 500 internal server errors under high concurrent traffic. How do you systematically debug it?` },
+          { id: 4, text: `How do you ensure clean modularity, design pattern adherence, and automated test coverage in production code?` },
+          { id: 5, text: `Do you have any technical questions for me about our engineering architecture or culture?` },
+        ]
+      }
+
+      const fallbackQuestions = getModeQuestions(interviewType, targetRole)
       setQuestions(fallbackQuestions)
       setCurrentQIndex(0)
       setTranscript([{ speaker: 'ai', text: fallbackQuestions[0].text }])
@@ -279,7 +331,7 @@ export default function MockInterviewModal({ isOpen, onClose, savedResumeName })
     } catch (err) {
       console.error('Interview evaluation error:', err)
       // Provide robust evaluation fallback
-      setEvaluation({
+      const evalReport = {
         overallScore: 84,
         technicalKnowledgeScore: 86,
         communicationScore: 82,
@@ -320,7 +372,22 @@ export default function MockInterviewModal({ isOpen, onClose, savedResumeName })
             whatCouldImprove: 'Include quantitative metrics or mention specific trade-offs.',
             betterApproach: 'Structure answer using STAR: Situation, Task, Action Taken, and Impact.',
           })),
-      })
+      }
+      setEvaluation(evalReport)
+      try {
+        const historyItem = {
+          id: Date.now(),
+          targetRole,
+          interviewType,
+          overallScore: evalReport.overallScore,
+          date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+          evaluation: evalReport,
+        }
+        const existing = JSON.parse(localStorage.getItem('cc_interview_reports') || '[]')
+        localStorage.setItem('cc_interview_reports', JSON.stringify([historyItem, ...existing]))
+      } catch (e) {
+        console.warn('LocalStorage save error:', e)
+      }
       toast.success('Interview Evaluation Ready! 🎉')
     } finally {
       setIsEvaluating(false)
@@ -346,13 +413,6 @@ export default function MockInterviewModal({ isOpen, onClose, savedResumeName })
     }
   }
 
-  // Clean up speech synthesis & recognition on unmount
-  useEffect(() => {
-    return () => {
-      stopSpeaking()
-      stopListening()
-    }
-  }, [])
 
   return (
     <div style={{
@@ -495,23 +555,30 @@ export default function MockInterviewModal({ isOpen, onClose, savedResumeName })
                 <label style={{ fontSize: '0.85rem', fontWeight: 700, color: '#334155', display: 'block', marginBottom: 8 }}>
                   Interview Type:
                 </label>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
-                  {['Technical', 'HR', 'Behavioral', 'Mixed'].map(type => (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(135px, 1fr))', gap: 10 }}>
+                  {[
+                    { id: 'Technical', label: 'Technical', sub: 'DSA & Stack' },
+                    { id: 'HR', label: 'HR Round', sub: 'Culture & Fit' },
+                    { id: 'Coding', label: 'Live Coding', sub: 'Algorithms' },
+                    { id: 'SystemDesign', label: 'System Design', sub: 'Scale & Cloud' },
+                    { id: 'Behavioral', label: 'Behavioral', sub: 'STAR & Projects' },
+                  ].map(m => (
                     <button
-                      key={type}
-                      onClick={() => setInterviewType(type)}
+                      key={m.id}
+                      type="button"
+                      onClick={() => setInterviewType(m.id)}
                       style={{
-                        padding: '10px 14px',
+                        padding: '10px 12px',
                         borderRadius: 12,
-                        fontSize: '0.88rem',
-                        fontWeight: 700,
+                        textAlign: 'center',
                         cursor: 'pointer',
-                        border: interviewType === type ? '1.5px solid #0D9488' : '1px solid #E2E8F0',
-                        background: interviewType === type ? '#F0FDFA' : '#FFFFFF',
-                        color: interviewType === type ? '#0F766E' : '#475569',
+                        border: interviewType === m.id ? '2px solid #0D9488' : '1px solid #E2E8F0',
+                        background: interviewType === m.id ? '#F0FDFA' : '#FFFFFF',
+                        color: interviewType === m.id ? '#0F766E' : '#475569',
                       }}
                     >
-                      {type}
+                      <div style={{ fontSize: '0.88rem', fontWeight: 800 }}>{m.label}</div>
+                      <div style={{ fontSize: '0.72rem', opacity: 0.8, marginTop: 2 }}>{m.sub}</div>
                     </button>
                   ))}
                 </div>
@@ -1222,27 +1289,52 @@ export default function MockInterviewModal({ isOpen, onClose, savedResumeName })
               justifyContent: 'space-between',
               background: '#FAFAFA',
             }}>
-              <button
-                onClick={() => setPhase('setup')}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  padding: '9px 18px',
-                  borderRadius: 12,
-                  border: '1px solid #CBD5E1',
-                  background: '#FFFFFF',
-                  color: '#334155',
-                  fontSize: '0.88rem',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                }}
-              >
-                <RotateCcw size={15} />
-                <span>Practice Weak Areas / Try Again</span>
-              </button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <button
+                  type="button"
+                  onClick={() => setPhase('setup')}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    padding: '9px 16px',
+                    borderRadius: 12,
+                    border: '1px solid #CBD5E1',
+                    background: '#FFFFFF',
+                    color: '#334155',
+                    fontSize: '0.88rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  <RotateCcw size={15} />
+                  <span>Practice Again</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    padding: '9px 16px',
+                    borderRadius: 12,
+                    border: '1px solid #0D9488',
+                    background: '#F0FDFA',
+                    color: '#0F766E',
+                    fontSize: '0.88rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
+                >
+                  <Download size={15} />
+                  <span>Download / Print Report (PDF)</span>
+                </button>
+              </div>
 
               <button
+                type="button"
                 onClick={onClose}
                 style={{
                   padding: '9px 22px',

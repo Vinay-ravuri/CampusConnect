@@ -47,7 +47,7 @@ export default function BrowseSidebar({
         overflowY: 'auto',
         zIndex: 10,
       }}
-      className="hidden lg:block cc-browse-sidebar"
+      className="cc-browse-sidebar cc-sticky-sidebar"
     >
       {/* Title */}
       <div

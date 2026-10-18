@@ -303,7 +303,7 @@ export default function JobsPage() {
         background: '#F8FAFC',
         color: '#0F172A',
         fontFamily: 'Inter, sans-serif',
-        overflowX: 'hidden',
+        overflowX: 'clip',
       }}
     >
       {/* ── Soft Cobalt Blue Background Atmospheric Glows ── */}
@@ -679,7 +679,7 @@ export default function JobsPage() {
               overflowY: 'auto',
               zIndex: 10,
             }}
-            className="cc-jobs-right-col"
+            className="cc-jobs-right-col cc-sticky-sidebar"
           >
             {/* Top Hiring Companies Grid */}
             <HiringCompanies

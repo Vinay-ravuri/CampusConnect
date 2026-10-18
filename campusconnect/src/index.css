@@ -905,4 +905,113 @@ input:focus, textarea:focus, select:focus {
   }
 }
 
+/* ─── PROFESSIONAL COMPANY-LEVEL MICRO-INTERACTIONS & ANIMATIONS ─── */
+button,
+[role="button"],
+.btn,
+.interactive-btn {
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.2s ease,
+              filter 0.18s ease,
+              background-color 0.18s ease,
+              border-color 0.18s ease,
+              color 0.18s ease;
+  user-select: none;
+}
+
+button:hover:not(:disabled),
+[role="button"]:hover:not([aria-disabled="true"]) {
+  filter: brightness(1.03);
+}
+
+button:active:not(:disabled),
+[role="button"]:active:not([aria-disabled="true"]),
+.btn:active:not(:disabled) {
+  transform: scale(0.96) translateY(1px) !important;
+}
+
+/* Fluid Hover Lift on Interactive Cards */
+.card-hover,
+.interactive-card {
+  transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1),
+              box-shadow 0.22s ease,
+              border-color 0.22s ease !important;
+}
+
+.card-hover:hover,
+.interactive-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
+}
+
+.card-hover:active,
+.interactive-card:active {
+  transform: translateY(-1px) scale(0.995);
+}
+
+/* Pulse / Glow Animation for Badges and Live Indicators */
+@keyframes livePulse {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+.live-pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10B981;
+  display: inline-block;
+  animation: livePulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+/* Sticky Sidebar Helper with Smooth Scroll */
+.cc-sticky-sidebar {
+  position: sticky !important;
+  top: 90px !important;
+  align-self: flex-start !important;
+  max-height: calc(100vh - 110px) !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+}
+
+.cc-sticky-sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+.cc-sticky-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 4px;
+}
+.cc-sticky-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ─── PRINT STYLES FOR OFFICIAL VERIFIED CERTIFICATE ─── */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .certificate-printable-area,
+  .certificate-printable-area * {
+    visibility: visible !important;
+  }
+  .certificate-printable-area {
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    margin: 0 !important;
+    padding: 20px !important;
+    box-sizing: border-box !important;
+    background: #FFFFFF !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
+
+
 

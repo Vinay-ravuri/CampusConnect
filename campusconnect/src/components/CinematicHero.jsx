@@ -46,6 +46,9 @@ export default function CinematicHero({ onScrollProgressChange, onExploreClick }
     const ctx = canvas.getContext('2d', { alpha: true })
     if (!ctx) return
 
+    ctx.imageSmoothingEnabled = true
+    ctx.imageSmoothingQuality = 'high'
+
     const cw = canvas.width
     const ch = canvas.height
     const iw = bmp.width
@@ -53,15 +56,17 @@ export default function CinematicHero({ onScrollProgressChange, onExploreClick }
 
     ctx.clearRect(0, 0, cw, ch)
 
-    // Fill contain/cover with scale factor matching reference proportions
+    // Fit and center crisply without over-zooming so native 1080p details remain razor sharp
+    const isMobile = window.innerWidth < 900
     const hRatio = cw / iw
     const vRatio = ch / ih
-    const ratio = Math.max(hRatio, vRatio) * 1.04
+    const scaleFactor = isMobile ? 1.02 : 1.06
+    const ratio = Math.max(hRatio, vRatio) * scaleFactor
 
     const dw = iw * ratio
     const dh = ih * ratio
-    const dx = (cw - dw) / 2 + (cw * 0.03)
-    const dy = (ch - dh) / 2 + (ch * 0.01)
+    const dx = (cw - dw) / 2
+    const dy = (ch - dh) / 2
 
     ctx.drawImage(bmp, dx, dy, dw, dh)
   }, [])
@@ -97,9 +102,14 @@ export default function CinematicHero({ onScrollProgressChange, onExploreClick }
         .then((bmp) => {
           bitmapsRef.current[idx] = bmp
           count++
-          if (count >= 3) {
+          const cur = Math.round(currentFrameRef.current)
+          if (cur === idx || (idx === 0 && !bitmapsRef.current[cur])) {
+            drawFrame(bmp)
+          }
+          if (count >= 2) {
             setIsLoaded(true)
-            if (idx === 0) drawFrame(bmp)
+            const activeBmp = bitmapsRef.current[cur] || bitmapsRef.current[0]
+            if (activeBmp) drawFrame(activeBmp)
           }
         })
         .catch(() => {})
@@ -109,7 +119,7 @@ export default function CinematicHero({ onScrollProgressChange, onExploreClick }
       for (let i = 0; i < TOTAL_FRAMES; i++) {
         loadBitmap(i)
       }
-    }, 400)
+    }, 300)
 
     return () => clearTimeout(timer)
   }, [drawFrame, loadBitmap])
@@ -298,45 +308,35 @@ export default function CinematicHero({ onScrollProgressChange, onExploreClick }
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'flex-end',
+            paddingRight: 'clamp(16px, 3.5vw, 64px)',
           }}
         >
-          {/* Canvas Wrapper with Multi-Directional Feathering Masks */}
+          {/* Canvas Wrapper with Razor-Sharp Frame (No Murky Blurs, 100% Solid Opacity) */}
           <div
             className="cinematic-canvas-wrapper"
             style={{
               position: 'relative',
-              width: 'clamp(700px, 72vw, 1400px)',
-              height: '96vh',
-              marginRight: '-1vw',
+              width: 'clamp(580px, 56vw, 1160px)',
+              height: 'clamp(520px, 88vh, 880px)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              /* Feathered edge masks: seamlessly dissolve borders into dark background */
-              maskImage: `
-                linear-gradient(to right, transparent 0%, rgba(0,0,0,0.1) 8%, rgba(0,0,0,0.9) 26%, black 45%, black 76%, rgba(0,0,0,0.4) 90%, transparent 100%),
-                linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.15) 7%, black 20%, black 80%, rgba(0,0,0,0.3) 92%, transparent 100%),
-                radial-gradient(ellipse 72% 68% at 65% 52%, black 40%, rgba(0,0,0,0.85) 66%, transparent 97%)
-              `,
-              WebkitMaskImage: `
-                linear-gradient(to right, transparent 0%, rgba(0,0,0,0.1) 8%, rgba(0,0,0,0.9) 26%, black 45%, black 76%, rgba(0,0,0,0.4) 90%, transparent 100%),
-                linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.15) 7%, black 20%, black 80%, rgba(0,0,0,0.3) 92%, transparent 100%),
-                radial-gradient(ellipse 72% 68% at 65% 52%, black 40%, rgba(0,0,0,0.85) 66%, transparent 97%)
-              `,
-              maskComposite: 'intersect',
-              WebkitMaskComposite: 'destination-in',
+              /* Smooth edge dissolve strictly at outer perimeter, preserving 100% crisp center */
+              maskImage: 'radial-gradient(ellipse 92% 88% at 50% 50%, black 72%, rgba(0, 0, 0, 0.82) 84%, transparent 100%)',
+              WebkitMaskImage: 'radial-gradient(ellipse 92% 88% at 50% 50%, black 72%, rgba(0, 0, 0, 0.82) 84%, transparent 100%)',
             }}
           >
             {/* Glowing Pedestal Backdrop Ring */}
             <div
               style={{
                 position: 'absolute',
-                bottom: '10%',
-                left: '52%',
+                bottom: '5%',
+                left: '50%',
                 transform: 'translateX(-50%)',
-                width: '78%',
-                height: '80px',
+                width: '84%',
+                height: '90px',
                 borderRadius: '50%',
-                background: 'radial-gradient(ellipse, rgba(253, 186, 18, 0.35) 0%, rgba(249, 115, 22, 0.16) 45%, transparent 75%)',
+                background: 'radial-gradient(ellipse, rgba(253, 186, 18, 0.4) 0%, rgba(249, 115, 22, 0.18) 50%, transparent 75%)',
                 filter: 'blur(24px)',
                 pointerEvents: 'none',
                 zIndex: 1,
@@ -351,7 +351,7 @@ export default function CinematicHero({ onScrollProgressChange, onExploreClick }
                   height: '100%',
                   position: 'relative',
                   zIndex: 2,
-                  filter: 'contrast(1.16) brightness(0.86) saturate(1.2)',
+                  filter: 'contrast(1.04) brightness(1.02) saturate(1.12)',
                 }}
               />
             ) : (
@@ -368,18 +368,6 @@ export default function CinematicHero({ onScrollProgressChange, onExploreClick }
               />
             )}
 
-            {/* Dark Studio Multiply Vignette Overlay to blend studio floor into #05070B */}
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                zIndex: 3,
-                pointerEvents: 'none',
-                background: 'radial-gradient(ellipse 65% 60% at 65% 50%, transparent 20%, rgba(5, 7, 11, 0.45) 55%, #05070B 88%)',
-                mixBlendMode: 'multiply',
-              }}
-            />
-
             {/* Warm Golden Atmosphere Bloom Overlay */}
             <div
               style={{
@@ -387,7 +375,7 @@ export default function CinematicHero({ onScrollProgressChange, onExploreClick }
                 inset: 0,
                 zIndex: 4,
                 pointerEvents: 'none',
-                background: 'radial-gradient(ellipse 75% 70% at 65% 50%, rgba(249, 115, 22, 0.12) 0%, rgba(253, 186, 18, 0.05) 40%, transparent 70%)',
+                background: 'radial-gradient(ellipse 75% 70% at 50% 50%, rgba(249, 115, 22, 0.12) 0%, rgba(253, 186, 18, 0.05) 42%, transparent 75%)',
                 mixBlendMode: 'screen',
               }}
             />
@@ -656,7 +644,7 @@ export default function CinematicHero({ onScrollProgressChange, onExploreClick }
           height: '160px',
           background: 'linear-gradient(180deg, transparent 0%, rgba(5, 7, 11, 0.8) 40%, #FFF9F0 100%)',
           pointerEvents: 'none',
-          zIndex: 4,
+          zIndex: 1,
         }}
       />
 
@@ -664,9 +652,11 @@ export default function CinematicHero({ onScrollProgressChange, onExploreClick }
         @media (max-width: 900px) {
           .cinematic-canvas-wrapper {
             width: 100vw !important;
-            height: 60vh !important;
+            height: 68vh !important;
             margin-right: 0 !important;
-            opacity: 0.85;
+            opacity: 1 !important;
+            mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.2) 8%, black 22%, black 80%, transparent 100%) !important;
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.2) 8%, black 22%, black 80%, transparent 100%) !important;
           }
         }
       `}</style>

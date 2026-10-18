@@ -6,11 +6,11 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      // Forward all /api requests to Spring Boot on port 8081
+      // Forward all /api requests to Spring Boot on port 8082
       // The configure block strips the Origin header so Spring Boot's
       // CORS filter sees the request as same-origin (no CORS block).
       '/api': {
-        target: 'http://localhost:8081',
+        target: 'http://localhost:8082',
         changeOrigin: true,
         secure: false,
         configure: (proxy) => {
@@ -19,7 +19,7 @@ export default defineConfig({
             proxyReq.removeHeader('Origin')
             proxyReq.removeHeader('Referer')
             // Set origin to match Spring Boot's own host
-            proxyReq.setHeader('Origin', 'http://localhost:8081')
+            proxyReq.setHeader('Origin', 'http://localhost:8082')
           })
         },
       },

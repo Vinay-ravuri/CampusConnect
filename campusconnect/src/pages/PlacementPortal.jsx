@@ -213,6 +213,91 @@ const TARGET_COURSE_PRESETS = [
     category: 'CORE_CS',
     defaultProgress: 0,
   },
+  {
+    slug: 'python-mastery',
+    matchKeywords: ['python', 'py', 'automation'],
+    title: 'Python for Developers & Problem Solving',
+    description: 'Data Structures, OOP, Generators, Automation & Scripting',
+    difficulty: 'Beginner',
+    isCertified: true,
+    rating: '4.9',
+    reviewsCount: '4.1k',
+    estimatedHours: '35 hrs',
+    lessonCount: '110 Lessons',
+    iconEmoji: '🐍',
+    iconColor: '#10B981',
+    iconBg: '#ECFDF5',
+    category: 'DEV',
+    defaultProgress: 0,
+  },
+  {
+    slug: 'spring-microservices',
+    matchKeywords: ['spring', 'spring boot', 'microservices', 'java'],
+    title: 'Spring Boot & Microservices Architecture',
+    description: 'REST APIs, JPA/Hibernate, Spring Security, JWT & Docker',
+    difficulty: 'Advanced',
+    isCertified: true,
+    rating: '4.9',
+    reviewsCount: '3.6k',
+    estimatedHours: '45 hrs',
+    lessonCount: '140 Lessons',
+    iconEmoji: '🍃',
+    iconColor: '#059669',
+    iconBg: '#ECFDF5',
+    category: 'DEV',
+    defaultProgress: 0,
+  },
+  {
+    slug: 'devops-docker',
+    matchKeywords: ['devops', 'docker', 'kubernetes', 'ci/cd'],
+    title: 'DevOps, Docker & Cloud Deployment',
+    description: 'Containerization, Kubernetes, GitHub Actions & CI/CD Pipelines',
+    difficulty: 'Intermediate',
+    isCertified: true,
+    rating: '4.8',
+    reviewsCount: '2.3k',
+    estimatedHours: '28 hrs',
+    lessonCount: '80 Lessons',
+    iconEmoji: '🐳',
+    iconColor: '#2563EB',
+    iconBg: '#EFF6FF',
+    category: 'DEV',
+    defaultProgress: 0,
+  },
+  {
+    slug: 'ai-ml-basics',
+    matchKeywords: ['ai', 'machine learning', 'genai', 'llm'],
+    title: 'Generative AI & LLM Foundations',
+    description: 'Prompt Engineering, LangChain, RAG Systems & Vector Databases',
+    difficulty: 'Intermediate',
+    isCertified: true,
+    rating: '4.9',
+    reviewsCount: '5.2k',
+    estimatedHours: '32 hrs',
+    lessonCount: '95 Lessons',
+    iconEmoji: '🤖',
+    iconColor: '#7C3AED',
+    iconBg: '#F5F3FF',
+    category: 'DEV',
+    defaultProgress: 0,
+  },
+  {
+    slug: 'cloud-aws',
+    matchKeywords: ['cloud', 'aws', 'infrastructure'],
+    title: 'AWS Cloud Architecture & Serverless',
+    description: 'EC2, S3, Lambda, API Gateway, DynamoDB & VPC Setup',
+    difficulty: 'Intermediate',
+    isCertified: true,
+    rating: '4.8',
+    reviewsCount: '2.7k',
+    estimatedHours: '30 hrs',
+    lessonCount: '85 Lessons',
+    iconEmoji: '☁️',
+    iconColor: '#EA580C',
+    iconBg: '#FFF7ED',
+    category: 'SYSTEM_DESIGN',
+    defaultProgress: 0,
+  },
 ]
 
 export default function PlacementPortal() {
@@ -357,47 +442,50 @@ export default function PlacementPortal() {
     } catch (err) {
       console.warn(`Unable to fetch /public/placement/tracks/${slug}, using fallback details:`, err)
       // Provide clean simulated module tree if backend slug doesn't match
-      setTrackDetailData({
-        ...course,
-        modules: [
-          {
-            id: 101,
-            title: '01. Foundational Principles & Core Concepts',
-            description: 'Essential theory, syntactical patterns and time-space complexity.',
-            topics: [
-              { id: 1, title: 'Concept Introduction & Blueprint', description: 'Core principles tested in recruiter screening rounds.', practiceType: 'CONCEPT', difficulty: 'Easy' },
-              { id: 2, title: 'Practical Implementation & Syntax', description: 'Hands-on coding drill with edge case verification.', practiceType: 'CODING', difficulty: 'Medium' },
-            ],
-          },
-          {
-            id: 102,
-            title: '02. Advanced Patterns & Real-world Challenges',
-            description: 'Solving company-specific recurring interview challenges.',
-            topics: [
-              { id: 3, title: 'Algorithmic Optimization & Trade-offs', description: 'Transforming brute force O(N^2) to optimal O(N) approaches.', practiceType: 'CODING', difficulty: 'Hard' },
-              { id: 4, title: 'Interview Defense & STAR Discussion', description: 'Defending architectural decisions in 1-on-1 technical rounds.', practiceType: 'CONCEPT', difficulty: 'Medium' },
-            ],
-          },
-        ],
-      })
-      setCurrentModules([
+      const generatedModules = [
         {
           id: 101,
-          title: '01. Foundational Principles & Core Concepts',
+          title: '01. Foundational Architecture & Core Blueprint',
+          description: `Essential principles, language syntactical patterns, and time-space memory allocation for ${course.title}.`,
           topics: [
-            { id: 1, title: 'Concept Introduction & Blueprint', practiceType: 'CONCEPT', difficulty: 'Easy' },
-            { id: 2, title: 'Practical Implementation & Syntax', practiceType: 'CODING', difficulty: 'Medium' },
+            { id: 1, title: `${course.title} — Blueprint & Mental Models`, description: 'Core principles tested in recruiter screening rounds and technical assessments.', practiceType: 'CONCEPT', difficulty: 'Easy', conceptSummary: `Foundational overview of ${course.title}. Covers the primary building blocks, operational flow, and mental models necessary to excel in technical assessments.` },
+            { id: 2, title: 'Hands-on Implementation & Edge Cases', description: 'Interactive coding drill with edge case verification and boundary checks.', practiceType: 'CODING', difficulty: 'Medium', conceptSummary: 'Detailed practical implementation. We analyze boundary conditions, null checks, and memory footprint.' },
           ],
         },
         {
           id: 102,
-          title: '02. Advanced Patterns & Real-world Challenges',
+          title: '02. Algorithmic Optimization & Trade-offs',
+          description: 'Transforming naive brute force approaches into production-grade optimal solutions.',
           topics: [
-            { id: 3, title: 'Algorithmic Optimization & Trade-offs', practiceType: 'CODING', difficulty: 'Hard' },
-            { id: 4, title: 'Interview Defense & STAR Discussion', practiceType: 'CONCEPT', difficulty: 'Medium' },
+            { id: 3, title: 'Time & Space Complexity Optimization', description: 'Transforming brute force O(N²) to optimal O(N) or O(log N) algorithms.', practiceType: 'CODING', difficulty: 'Medium', conceptSummary: 'Techniques for profiling code execution and choosing the right auxiliary data structures to minimize runtime.' },
+            { id: 4, title: 'Concurrency, Data Integrity & Scalability', description: 'Thread safety, atomic transactions, and distributed considerations.', practiceType: 'CONCEPT', difficulty: 'Hard', conceptSummary: 'Evaluating system behavior under heavy student traffic and high transaction concurrency.' },
           ],
         },
-      ])
+        {
+          id: 103,
+          title: '03. Real-world Industry Patterns & Case Studies',
+          description: 'Production best practices, design patterns, and defensive programming.',
+          topics: [
+            { id: 5, title: 'Design Patterns & High-Scale Refactoring', description: 'Factory, Singleton, Repository, and Observer patterns applied in real code.', practiceType: 'CODING', difficulty: 'Hard', conceptSummary: 'Structuring code cleanly for long-term maintainability and modular decoupling.' },
+            { id: 6, title: 'Enterprise Security & Performance Audits', description: 'Input sanitation, JWT validation, caching strategies, and indexing.', practiceType: 'CONCEPT', difficulty: 'Medium', conceptSummary: 'Preventing vulnerabilities and profiling bottle-necks before deploying to production.' },
+          ],
+        },
+        {
+          id: 104,
+          title: '04. Campus Recruitment & FAANG Technical Screening',
+          description: 'Company-specific recurring questions, live whiteboard drills, and STAR defense.',
+          topics: [
+            { id: 7, title: 'Live Coding Benchmark & Whiteboard Drill', description: 'Simulated 45-minute live coding challenge with automated test suites.', practiceType: 'CODING', difficulty: 'Hard', conceptSummary: 'Practicing effective communication while coding live under strict assessment time limits.' },
+            { id: 8, title: 'Technical Interview Defense & STAR Discussion', description: 'Defending architectural decisions in 1-on-1 rounds with Senior Engineering Leads.', practiceType: 'CONCEPT', difficulty: 'Hard', conceptSummary: 'Structuring technical explanations using the STAR framework to convince hiring managers.' },
+          ],
+        },
+      ]
+
+      setTrackDetailData({
+        ...course,
+        modules: generatedModules,
+      })
+      setCurrentModules(generatedModules)
     } finally {
       setLoadingTrackDetail(false)
     }
